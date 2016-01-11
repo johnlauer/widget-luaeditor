@@ -1,7 +1,7 @@
 # com-chilipeppr-widget-luaeditor
 Edit and run Lua code. Lots of sample Lua code too.
 
-![alt text](screenshot.png "Screenshot")
+
 
 ## ChiliPeppr Widget / Lua Editor
 
