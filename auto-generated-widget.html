@@ -240,8 +240,11 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
             return this.jscript;
         },
         runScript: function(macroStr, helpTxt) {
-                        
-            // allow a custom macro to be passed in
+            
+            // hide popover
+            $('#' + this.id + ' .luaeditor-run').popover('hide');
+            
+            // allow a custom script to be passed in
             if (typeof macroStr === "string") {
                 this.jscript = macroStr;
             } else {
@@ -286,7 +289,15 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
         },
         saveScript: function() {
             
+            $('#' + this.id + ' .luaeditor-save').popover('hide');
+            
             var fileStr = this.getScript();
+            
+            if (fileStr.length == 0) {
+                this.status("Your script seems to be empty. Not saving.");
+                return;
+            }
+            
             var firstLine = "";
             if (fileStr.match(/(.*)\r{0,1}\n/)) {
                 // we have our first line
