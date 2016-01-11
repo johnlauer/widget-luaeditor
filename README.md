@@ -3,7 +3,7 @@ Edit and run Lua code. Lots of sample Lua code too.
 
 ![alt text](screenshot.png "Screenshot")
 
-## ChiliPeppr Widget / Macro
+## ChiliPeppr Widget / Lua Editor
 
 All ChiliPeppr widgets/elements are defined using cpdefine() which is a method
 that mimics require.js. Each defined object must have a unique ID so it does
@@ -12,7 +12,7 @@ not conflict with other ChiliPeppr widgets.
 | Item                  | Value           |
 | -------------         | ------------- | 
 | ID                    | com-chilipeppr-widget-luaeditor |
-| Name                  | Widget / Macro |
+| Name                  | Widget / Lua Editor |
 | Description           | Edit and run Lua code. Lots of sample Lua code too. |
 | chilipeppr.load() URL | http://raw.githubusercontent.com/chilipeppr/widget-luaeditor/master/auto-generated-widget.html |
 | Edit URL              | http://ide.c9.io/chilipeppr/widget-luaeditor |
@@ -90,7 +90,7 @@ The table below shows, in order, the methods and properties inside the widget/el
 | Item                  | Type          | Description |
 | -------------         | ------------- | ----------- |
 | id | string | "com-chilipeppr-widget-luaeditor"<br><br>The ID of the widget. You must define this and make it unique. |
-| name | string | "Widget / Macro" |
+| name | string | "Widget / Lua Editor" |
 | desc | string | "Edit and run Lua code. Lots of sample Lua code too." |
 | url | string | "http://raw.githubusercontent.com/chilipeppr/widget-luaeditor/master/auto-generated-widget.html" |
 | fiddleurl | string | "http://ide.c9.io/chilipeppr/widget-luaeditor" |
