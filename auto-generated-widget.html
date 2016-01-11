@@ -74,6 +74,7 @@ cprequire_test(["inline:com-chilipeppr-widget-luaeditor"], function(myWidget) {
 
     // init my widget
     myWidget.init();
+    myWidget.resize();
 
 } /*end_test*/ );
 
@@ -425,6 +426,21 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
             this.jscript = localStorage.getItem(key);
             this.loadJscript(this.jscript);
             this.status("Loaded data \"" + info.name + "\"");
+        },
+        /**
+         * Resize the widget to the height of the window
+         */
+        resize: function() {
+            // add the top of the widget + height of widget
+            // to get sizing. then subtract that from height of window to figure out what 
+            // height to add (subtract) from log
+            var wdgt = $('#' + this.id);
+            var wht = wdgt.offset().top + wdgt.height();
+            var delta = $(window).height() - wht;
+            //console.log("delta:", delta, "wht:", wht);
+            var logEl = $('#' + this.id + ' .luaeditor-maineditor');
+            var loght = logEl.height();
+            logEl.height(loght + delta - 13);
         },
         loadJscript: function(txt) {
             //this.jscript = txt;
