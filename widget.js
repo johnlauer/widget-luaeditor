@@ -135,7 +135,7 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
         },
         saveStartup: function(evt) {
             console.log("saveStartup. evt:", evt);
-            var fileStr = this.getJscript();
+            var fileStr = this.getScript();
             localStorage.setItem(this.id + '-startup', fileStr);
             this.status("Saved startup script");
         },
@@ -180,7 +180,7 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
 
                 chilipeppr.publish("/com-chilipeppr-widget-serialport/jsonSend", {
                     D: cmd + '\n',
-                    Id: "nodemcu-" + that.sendCtr++
+                    Id: "luaeditor-" + that.sendCtr++
                 });
 
                 ctr++;
@@ -189,7 +189,7 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
             }
         },
 
-        getJscript: function() {
+        getScript: function() {
             this.jscript = $('#' + this.id + ' .luaeditor-maineditor').val();
             return this.jscript;
         },
@@ -199,7 +199,7 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
             if (typeof macroStr === "string") {
                 this.jscript = macroStr;
             } else {
-                this.getJscript();
+                this.getScript();
             }
             
             //this.jscript = $('.com-chilipeppr-widget-macro-jscript').val();
@@ -212,7 +212,7 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
                 helpTxt = helpTxt.trim();
                 if (helpTxt.length > 0) helpTxt += " ";
 
-                this.status("Ran " + helpTxt + " script. "); // + this.jscript);
+                this.status("Ran " + helpTxt + "script. "); // + this.jscript);
             
             } else {
                 this.status("No script to run. Empty.");
@@ -240,7 +240,7 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
         },
         saveScript: function() {
             
-            var fileStr = this.getJscript();
+            var fileStr = this.getScript();
             var firstLine = "";
             if (fileStr.match(/(.*)\r{0,1}\n/)) {
                 // we have our first line

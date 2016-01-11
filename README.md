@@ -108,7 +108,7 @@ The table below shows, in order, the methods and properties inside the widget/el
 | makeTextareaAcceptTabs | function | function ()  |
 | sendCtr | number | Keep a counter so each send has its own ID so we can use jsonSendand get complete statuses back from SPJS when we send each lineto the serial port. |
 | send | function | function (txt) <br><br>Send the script off to the serial port. |
-| getJscript | function | function ()  |
+| getScript | function | function ()  |
 | runScript | function | function (macroStr, helpTxt)  |
 | jscriptKeypress | function | function (evt)  |
 | showData | function | function (datatxt)  |
