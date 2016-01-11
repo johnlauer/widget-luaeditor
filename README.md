@@ -1,5 +1,5 @@
-# com-chilipeppr-widget-macro
-Edit and run Javascript macros inside ChiliPeppr. Lots of sample macros too.
+# com-chilipeppr-widget-luaeditor
+Edit and run Lua code. Lots of sample Lua code too.
 
 ![alt text](screenshot.png "Screenshot")
 
@@ -11,13 +11,13 @@ not conflict with other ChiliPeppr widgets.
 
 | Item                  | Value           |
 | -------------         | ------------- | 
-| ID                    | com-chilipeppr-widget-macro |
+| ID                    | com-chilipeppr-widget-luaeditor |
 | Name                  | Widget / Macro |
-| Description           | Edit and run Javascript macros inside ChiliPeppr. Lots of sample macros too. |
-| chilipeppr.load() URL | http://raw.githubusercontent.com/chilipeppr/com-chilipeppr-widget-macro/master/auto-generated-widget.html |
-| Edit URL              | http://ide.c9.io/chilipeppr/com-chilipeppr-widget-macro |
-| Github URL            | http://github.com/chilipeppr/com-chilipeppr-widget-macro |
-| Test URL              | https://preview.c9users.io/chilipeppr/com-chilipeppr-widget-macro/widget.html |
+| Description           | Edit and run Lua code. Lots of sample Lua code too. |
+| chilipeppr.load() URL | http://raw.githubusercontent.com/chilipeppr/widget-luaeditor/master/auto-generated-widget.html |
+| Edit URL              | http://ide.c9.io/chilipeppr/widget-luaeditor |
+| Github URL            | http://github.com/chilipeppr/widget-luaeditor |
+| Test URL              | https://preview.c9users.io/chilipeppr/widget-luaeditor/widget.html |
 
 ## Example Code for chilipeppr.load() Statement
 
@@ -30,11 +30,11 @@ back the instance of it.
 ```javascript
 chilipeppr.load(
   "#myDivWidgetInsertedInto",
-  "http://raw.githubusercontent.com/chilipeppr/com-chilipeppr-widget-macro/master/auto-generated-widget.html",
+  "http://raw.githubusercontent.com/chilipeppr/widget-luaeditor/master/auto-generated-widget.html",
   function() {
     // Callback after widget loaded into #myDivWidgetInsertedInto
     cprequire(
-      "inline:com-chilipeppr-widget-macro", // the id you gave your widget
+      "inline:com-chilipeppr-widget-luaeditor", // the id you gave your widget
       function(mywidget) {
         // Callback that is passed reference to your newly loaded widget
         console.log("My widget just got loaded.", mywidget);
@@ -89,13 +89,13 @@ The table below shows, in order, the methods and properties inside the widget/el
 
 | Item                  | Type          | Description |
 | -------------         | ------------- | ----------- |
-| id | string | "com-chilipeppr-widget-macro"<br><br>The ID of the widget. You must define this and make it unique. |
+| id | string | "com-chilipeppr-widget-luaeditor"<br><br>The ID of the widget. You must define this and make it unique. |
 | name | string | "Widget / Macro" |
-| desc | string | "Edit and run Javascript macros inside ChiliPeppr. Lots of sample macros too." |
-| url | string | "http://raw.githubusercontent.com/chilipeppr/com-chilipeppr-widget-macro/master/auto-generated-widget.html" |
-| fiddleurl | string | "http://ide.c9.io/chilipeppr/com-chilipeppr-widget-macro" |
-| githuburl | string | "http://github.com/chilipeppr/com-chilipeppr-widget-macro" |
-| testurl | string | "http://com-chilipeppr-widget-macro-chilipeppr.c9users.io/widget.html" |
+| desc | string | "Edit and run Lua code. Lots of sample Lua code too." |
+| url | string | "http://raw.githubusercontent.com/chilipeppr/widget-luaeditor/master/auto-generated-widget.html" |
+| fiddleurl | string | "http://ide.c9.io/chilipeppr/widget-luaeditor" |
+| githuburl | string | "http://github.com/chilipeppr/widget-luaeditor" |
+| testurl | string | "http://widget-luaeditor-chilipeppr.c9users.io/widget.html" |
 | publish | object | Please see docs above.<br><br>Define the publish signals that this widget/element owns or defines so thatother widgets know how to subscribe to them and what they do. |
 | subscribe | object | Please see docs above.<br><br>Define the subscribe signals that this widget/element owns or defines so thatother widgets know how to subscribe to them and what they do. |
 | foreignPublish | object | Please see docs above.<br><br>Document the foreign publish signals, i.e. signals owned by other widgetsor elements, that this widget/element publishes to. |
@@ -103,7 +103,6 @@ The table below shows, in order, the methods and properties inside the widget/el
 | jscript | object |  |
 | init | function | function ()  |
 | setupStartup | function | function ()  |
-| onStartup | function | function ()  |
 | editStartup | function | function (evt)  |
 | saveStartup | function | function (evt)  |
 | makeTextareaAcceptTabs | function | function ()  |
@@ -121,31 +120,10 @@ The table below shows, in order, the methods and properties inside the widget/el
 | getMethodString | function | function (methodToGet)  |
 | autoAddMacros | object |  |
 | generateZigZag | function | function () <br><br>This macro helps you generate a zig zag toolpath inside of an overall rectangular shape. Give it the width and height of the rectangularshape. Then give it the step over value and it will generate the gcode and then send it to the workspace so you can visualize it and run it.<br><br>This can be used to mill out or pocket a workpiece. It can also be used to scan a laserover a surface to ablate or cure materialby scanning back and forth with a step over. |
-| watchChiliPepprPauseSolderDispenser | function | function () <br><br>This macro shows how to watch for the chilipepprpause sync event that is triggered if you includea comment in your gcode file like (chilipeppr_pause) or ; chilipeppr_pauseAnd then it sends commands to a 2nd CNC controllerto actually dispense solder paste<br><br>Here is a sample gcode file that uses chilipeppr_pause<pre>G0 X0 Y0 Z0<br>F50<br>G1 X10<br>(chilipeppr_pause trigger laser on)<br>G1 X20<br>(chilipeppr_pause trigger laser off)<br>G0 X0</pre> |
-| watchChiliPepprPause | function | function () <br><br>This macro shows how to watch for the chilipepprpause sync event that is triggered if you includea comment in your gcode file like (chilipeppr_pause) or ; chilipeppr_pause<br><br>Here is a sample gcode file that uses chilipeppr_pause<pre>G0 X0 Y0 Z0<br>F50<br>G1 X10<br>(chilipeppr_pause trigger laser on)<br>G1 X20<br>(chilipeppr_pause trigger laser off)<br>G0 X0</pre> |
-| flashMsg | function | function () <br><br>Shows how to generate a Flash Message inside ChiliPeppr, which isa message that shows by default for 3 seconds on top of everythingand then fades out. It's a great way to get the user's attentionwithout you having to write more than one line of code. |
-| get3dobj | function | function () <br><br>Get the object that represents the 3D viewer. Once you have it, youcan put anything into the 3D viewer that you'd like. You can wipeout the scene, or add to it, or adjust the properties. ChiliPeppruses Three.js so you can refer to the docs for Three.js to figureout different techniques for manipulating things. |
-| get3dobjG1FromG2G3 | function | function () <br><br>Convert G2/G3 arcs to G1 moves. If you are having problems with yourCNC controller converting arcs, you could actually rewrite your Gcodeto straight line moves (G1's) with this macro. Each arc gets turnedinto 24 line segments. |
-| injectBtn | function | function ()  |
-| rewriteGcode | function | function ()  |
-| watchOnCompleteControlArduino | function | function ()  |
-| iterateGcode | function | function ()  |
-| injectCams | function | function ()  |
-| downloadGcode | function | function ()  |
-| sendToArduino | function | function ()  |
-| cmdsSentViaTimeout | function | function ()  |
-| addbbox | function | function ()  |
-| fadeout | function | function ()  |
-| sendGcodeToWorkspace | function | function ()  |
-| runTestProbe | function | function ()  |
-| watch | function | function ()  |
 | sendSerial | function | function (gcode)  |
 | statEl | object |  |
 | status | function | function (txt)  |
-| getZMinSettings | function | function (donecallback)  |
-| threeDGetUserObject | function | function ()  |
-| threeDMakeText | function | function (vals)  |
-| forkSetup | function | function ()  |
+| forkSetup | function | function () <br><br>Add the fork menu to upper right corner caret. |
 
 
 ## About ChiliPeppr
