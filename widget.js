@@ -88,10 +88,10 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
 
             this.forkSetup();
             
-            $('#' + this.id + ' .luaeditor-run').click(this.runMacro.bind(this));
+            $('#' + this.id + ' .luaeditor-run').click(this.runScript.bind(this));
             
-            // saveMacro
-            $('#' + this.id + ' .luaeditor-save').click(this.saveMacro.bind(this));
+            // saveScript
+            $('#' + this.id + ' .luaeditor-save').click(this.saveScript.bind(this));
             
             // setup del files
             $('#' + this.id + ' .recent-file-delete').click( this.deleteRecentFiles.bind(this));
@@ -159,11 +159,41 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
                 }
             });
         },
+        /**
+         * Keep a counter so each send has its own ID so we can use jsonSend
+         * and get complete statuses back from SPJS when we send each line
+         * to the serial port.
+         */
+        sendCtr: 0,
+        /**
+         * Send the script off to the serial port.
+         */
+        send: function(txt) {
+            var cmds = txt.split(/\n/g);
+            var ctr = 0;
+            var that = this;
+
+            for (var indx in cmds) {
+                //setTimeout(function() {
+
+                var cmd = cmds[ctr];
+
+                chilipeppr.publish("/com-chilipeppr-widget-serialport/jsonSend", {
+                    D: cmd + '\n',
+                    Id: "nodemcu-" + that.sendCtr++
+                });
+
+                ctr++;
+
+                //}, 10 * indx);
+            }
+        },
+
         getJscript: function() {
             this.jscript = $('#' + this.id + ' .luaeditor-maineditor').val();
             return this.jscript;
         },
-        runMacro: function(macroStr, helpTxt) {
+        runScript: function(macroStr, helpTxt) {
                         
             // allow a custom macro to be passed in
             if (typeof macroStr === "string") {
@@ -175,27 +205,15 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
             //this.jscript = $('.com-chilipeppr-widget-macro-jscript').val();
             
             if (this.jscript && this.jscript.length > 1) {
-            try {
-                eval(this.jscript);
+            
+                this.send(this.jscript);
                 
                 if (!helpTxt) helpTxt = "";
                 helpTxt = helpTxt.trim();
                 if (helpTxt.length > 0) helpTxt += " ";
 
-                this.status("Ran " + helpTxt + "macro. "); // + this.jscript);
-            } catch(e) {
-                //var etxt = JSON.stringify(e);
-                console.log("Err running macro. err:", e);
-                var etxt = e.message;
-                var estack = null;
-                if ('stack' in e) estack = e.stack;
-                if (etxt != null && etxt.length > 0) {
-                    this.status("Error doing eval() on your script. Error: " + etxt );
-                    if (estack != null) this.status(estack);
-                } else {
-                    this.status("Error doing eval() on your script.");
-                }
-            }
+                this.status("Ran " + helpTxt + " script. "); // + this.jscript);
+            
             } else {
                 this.status("No script to run. Empty.");
             }
@@ -205,7 +223,7 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
             if (evt.ctrlKey && evt.keyCode == 10) {
                 // run the macro
                 //$('.com-chilipeppr-widget-macro-run').click();
-                this.runMacro();
+                this.runScript();
                 // mimic push on btn
                 $('#' + this.id + ' .luaeditor-run').addClass('active');
                 var that = this;
@@ -220,7 +238,7 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
             //$('#com-chilipeppr-widget-modal-macro-view .modal-title').text("View Probe Data");
             $('#com-chilipeppr-widget-modal-macro-view').modal('show');
         },
-        saveMacro: function() {
+        saveScript: function() {
             
             var fileStr = this.getJscript();
             var firstLine = "";
