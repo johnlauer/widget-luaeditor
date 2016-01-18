@@ -236,7 +236,7 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
             var txtArr = txt.split(/\n/g);
             for(var i in txtArr) {
                 var line = txtArr[i];
-                var lineEsc = line.replace(/"/, '\"');
+                var lineEsc = line.replace(/"/, '\\"');
                 this.send('file.writeline("' + lineEsc + '")')
             }
             this.send('file.close()');
