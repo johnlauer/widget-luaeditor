@@ -110,10 +110,118 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
             // popovers
             $('#' + this.id + ' .panel-heading .btn').popover();
             
+           this.setupUploadRun();
+            
             // see if startup script
             //.setupStartup();
             
             console.log(this.name + " done loading.");
+        },
+        /**
+         * Setup the Upload -> Run button
+         */
+        setupUploadRun: function() {
+            $('#' + this.id + ' .luaeditor-uploadrun').click(this.onOpenUploadRunRegion.bind(this));
+             // activate alert
+            $('#' + this.id + ' .alert-devicefilename')
+                //.alert()
+                //.addClass("hidden")
+                .on('closed.bs.alert', this.onCloseUploadRunRegion.bind(this));
+            // onchange
+            var boxEl = $('#' + this.id + ' .alert-devicefilename');
+            boxEl.on('change', this.cleanupFilename.bind(this));
+            
+            // setup individual buttons
+            $('#' + this.id + ' .btn-fileupload').click(this.upload.bind(this));
+
+        },
+        onOpenUploadRunRegion: function(evt) {
+            console.log("uploadRun called. evt:", evt);
+            
+            var btnEl = $('#' + this.id + ' .luaeditor-uploadrun');
+            btnEl.popover('hide');
+            
+            // see if filename box is showing, if not show it
+            var boxEl = $('#' + this.id + ' .alert-devicefilename');
+            if (boxEl.hasClass("hidden")) {
+                boxEl.removeClass("hidden");
+                btnEl.addClass("active")
+
+            } else {
+                
+                boxEl.addClass("hidden");
+                btnEl.removeClass("active");
+            }
+
+            // since we size our height ourselves, we better trigger resize cuz
+            // we just added height
+            this.resize();
+
+            
+            // see if filename, and if not show flash message
+            var fileEl = $('#' + this.id + ' .devicefilename');
+            var fileName = fileEl.val();
+            if (fileName && fileName.length > 0) {
+                // good there's a filename
+                // make sure there's no .lua extension
+                if (fileName.match(/\.lua$/i)) {
+                    fileEl.val(fileName.replace(/\.lua$/i, ""));
+                    fileName = fileEl.val();
+                }
+            } else {
+                //.flashMsg("Provide a Filename", "You need to provide a filename before you can upload and run.");
+            }
+        },
+        upload: function(evt) {
+            // grab txt of file
+            var txt = this.getScript();
+            var filename = this.cleanupFilename();
+            
+            if (filename == null || filename.length <= 0) {
+                // problem with filename
+                this.flashMsg("No Filename", "You need to provide a filename to upload.");
+                return;
+            }
+            
+            filename += ".lua";
+            
+            // split on newlines and upload per line
+            this.send('file.open("' + filename + '", "w")');
+            var txtArr = txt.split(/\n/g);
+            for(var i in txtArr) {
+                var line = txtArr[i];
+                var lineEsc = line.replace(/"/, '\"');
+                this.send('file.writeline("' + lineEsc + '")')
+            }
+            this.send('file.close()');
+        },
+        cleanupFilename: function() {
+            var fileEl = $('#' + this.id + ' .devicefilename');
+            var fileName = fileEl.val();
+            if (fileName && fileName.length > 0) {
+                // good there's a filename
+                // make sure there's no .lua extension
+                if (fileName.match(/\.lua$/i)) {
+                    fileEl.val(fileName.replace(/\.lua$/i, ""));
+                    fileName = fileEl.val();
+                }
+                //return fileName;
+            } else {
+                //.flashMsg("Provide a Filename", "You need to provide a filename before you can upload and run.");
+            }
+            return fileName;
+
+        },
+        onCloseUploadRunRegion: function() {
+            $('#' + this.id + ' .luaeditor-uploadrun').removeClass("active");
+            // see if filename box is showing, if it is hide it
+            var boxEl = $('#' + this.id + ' .alert-devicefilename');
+            if (!boxEl.hasClass("hidden")) {
+                boxEl.addClass("hidden");
+            }
+        },
+        flashMsg: function(title, msg) {
+            chilipeppr.publish("/com-chilipeppr-elem-flashmsg/flashmsg", title, msg);
         },
         setupStartup: function() {
             

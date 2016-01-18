@@ -102,6 +102,12 @@ The table below shows, in order, the methods and properties inside the widget/el
 | foreignSubscribe | object | Please see docs above.<br><br>Document the foreign subscribe signals, i.e. signals owned by other widgetsor elements, that this widget/element subscribes to. |
 | jscript | object |  |
 | init | function | function ()  |
+| setupUploadRun | function | function () <br><br>Setup the Upload -> Run button |
+| onOpenUploadRunRegion | function | function (evt)  |
+| upload | function | function (evt)  |
+| cleanupFilename | function | function ()  |
+| onCloseUploadRunRegion | function | function ()  |
+| flashMsg | function | function (title, msg)  |
 | setupStartup | function | function ()  |
 | editStartup | function | function (evt)  |
 | saveStartup | function | function (evt)  |
