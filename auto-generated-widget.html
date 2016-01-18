@@ -178,6 +178,7 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
             boxEl.on('change', this.cleanupFilename.bind(this));
             
             // setup individual buttons
+            $('#' + this.id + ' .btn-fileuploadrun').click(this.fileUploadAndRun.bind(this));
             $('#' + this.id + ' .btn-fileupload').click(this.fileUpload.bind(this));
             $('#' + this.id + ' .btn-filerun').click(this.fileRun.bind(this));
             $('#' + this.id + ' .btn-filedump').click(this.fileDump.bind(this));
@@ -220,6 +221,10 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
             } else {
                 //.flashMsg("Provide a Filename", "You need to provide a filename before you can upload and run.");
             }
+        },
+        fileUploadAndRun: function(evt) {
+            this.fileUpload();
+            this.fileRun();
         },
         fileUpload: function(evt) {
             // grab txt of file
