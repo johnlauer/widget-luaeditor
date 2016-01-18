@@ -132,7 +132,9 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
             boxEl.on('change', this.cleanupFilename.bind(this));
             
             // setup individual buttons
-            $('#' + this.id + ' .btn-fileupload').click(this.upload.bind(this));
+            $('#' + this.id + ' .btn-fileupload').click(this.fileUpload.bind(this));
+            $('#' + this.id + ' .btn-filedump').click(this.fileDump.bind(this));
+            
 
         },
         onOpenUploadRunRegion: function(evt) {
@@ -172,7 +174,7 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
                 //.flashMsg("Provide a Filename", "You need to provide a filename before you can upload and run.");
             }
         },
-        upload: function(evt) {
+        fileUpload: function(evt) {
             // grab txt of file
             var txt = this.getScript();
             var filename = this.cleanupFilename();
@@ -194,6 +196,20 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
                 this.send('file.writeline("' + lineEsc + '")')
             }
             this.send('file.close()');
+        },
+        fileDump: function(evt) {
+            var filename = this.cleanupFilename();
+            if (filename == null || filename.length <= 0) {
+                // problem with filename
+                this.flashMsg("No Filename", "You need to provide a filename to upload.");
+                return;
+            }
+            
+            filename += ".lua";
+            this.send('file.open("' + filename + '", "r")');
+            this.send('print(file.read())');
+            this.send('file.close()');
+
         },
         cleanupFilename: function() {
             var fileEl = $('#' + this.id + ' .devicefilename');

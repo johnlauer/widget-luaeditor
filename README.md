@@ -104,7 +104,8 @@ The table below shows, in order, the methods and properties inside the widget/el
 | init | function | function ()  |
 | setupUploadRun | function | function () <br><br>Setup the Upload -> Run button |
 | onOpenUploadRunRegion | function | function (evt)  |
-| upload | function | function (evt)  |
+| fileUpload | function | function (evt)  |
+| fileDump | function | function (evt)  |
 | cleanupFilename | function | function ()  |
 | onCloseUploadRunRegion | function | function ()  |
 | flashMsg | function | function (title, msg)  |
