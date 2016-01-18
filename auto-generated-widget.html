@@ -179,6 +179,7 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
             
             // setup individual buttons
             $('#' + this.id + ' .btn-fileupload').click(this.fileUpload.bind(this));
+            $('#' + this.id + ' .btn-filerun').click(this.fileRun.bind(this));
             $('#' + this.id + ' .btn-filedump').click(this.fileDump.bind(this));
             
 
@@ -238,16 +239,17 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
             var txtArr = txt.split(/\n/g);
             for(var i in txtArr) {
                 var line = txtArr[i];
-                var lineEsc = line.replace(/"/g, '\\"');
-                this.send('file.writeline("' + lineEsc + '")')
+                //var lineEsc = line.replace(/"/g, '\\"');
+                this.send('file.writeline([[' + line + ']])')
             }
             this.send('file.close()');
+            this.send('node.compile("' + filename + '")');
         },
         fileDump: function(evt) {
             var filename = this.cleanupFilename();
             if (filename == null || filename.length <= 0) {
                 // problem with filename
-                this.flashMsg("No Filename", "You need to provide a filename to upload.");
+                this.flashMsg("No Filename", "You need to provide a filename to dump it to the console.");
                 return;
             }
             
@@ -255,6 +257,18 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
             this.send('file.open("' + filename + '", "r")');
             this.send('print(file.read())');
             this.send('file.close()');
+
+        },
+        fileRun: function(evt) {
+            var filename = this.cleanupFilename();
+            if (filename == null || filename.length <= 0) {
+                // problem with filename
+                this.flashMsg("No Filename", "You need to provide a filename to run it.");
+                return;
+            }
+            
+            filename += ".lc";
+            this.send('dofile("' + filename + '")');
 
         },
         cleanupFilename: function() {
