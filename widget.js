@@ -136,6 +136,7 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
             $('#' + this.id + ' .btn-fileupload').click(this.fileUpload.bind(this));
             $('#' + this.id + ' .btn-filerun').click(this.fileRun.bind(this));
             $('#' + this.id + ' .btn-filedump').click(this.fileDump.bind(this));
+            $('#' + this.id + ' .btn-filedelete').click(this.fileDelete.bind(this));
             
 
         },
@@ -181,6 +182,9 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
             this.fileRun();
         },
         fileUpload: function(evt) {
+            
+            $(evt.currentTarget).popover('hide');
+
             // grab txt of file
             var txt = this.getScript();
             var filename = this.cleanupFilename();
@@ -205,6 +209,7 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
             this.send('node.compile("' + filename + '")');
         },
         fileDump: function(evt) {
+            $(evt.currentTarget).popover('hide');
             var filename = this.cleanupFilename();
             if (filename == null || filename.length <= 0) {
                 // problem with filename
@@ -218,7 +223,23 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
             this.send('file.close()');
 
         },
+        fileDelete: function(evt) {
+            console.log("fileDel. evt:", evt);
+            $(evt.currentTarget).popover('hide');
+            var filename = this.cleanupFilename();
+            if (filename == null || filename.length <= 0) {
+                // problem with filename
+                this.flashMsg("No Filename", "You need to provide a filename to dump it to the console.");
+                return;
+            }
+            
+            //filename += ".lua";
+            this.send('file.remove("' + filename + '.lua", "r")');
+            this.send('file.remove("' + filename + '.lc", "r")');
+
+        },
         fileRun: function(evt) {
+            $(evt.currentTarget).popover('hide');
             var filename = this.cleanupFilename();
             if (filename == null || filename.length <= 0) {
                 // problem with filename
