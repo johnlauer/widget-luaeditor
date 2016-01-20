@@ -284,21 +284,27 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
             }
             
             filename += ".lua";
-            /*
-            this.send('file.open("' + filename + '", "r")');
-            this.send('print(file.read())');
-            this.send('file.close()');
-            */
             
+            this.send('file.open("' + filename + '", "r")');
+            this.send('fileline = file.readline()');
+            this.send('while fileline do');
+            this.send('  print(string.gsub(fileline, "\\n$", ""))');
+            this.send('  fileline = file.readline()');
+            this.send('end');
+            this.send('file.close()');
+            this.send('fileline = nil');
+
             // create a file read script as temp file. save that file.
             // then run it. that way the dump is after everything so
             // folks can cut/paste cleanly
+            /*
             var tmpFile = "" +
             'file.open("' + filename + '", "r")\n' +
             'print(file.read())\n' +
             'file.close()\n'
             '';
             this.rawUploadAndRun(tmpFile, "tmp");
+            */
             
 
         },
