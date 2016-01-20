@@ -106,6 +106,7 @@ The table below shows, in order, the methods and properties inside the widget/el
 | onOpenUploadRunRegion | function | function (evt)  |
 | fileUploadAndRun | function | function (evt)  |
 | fileUpload | function | function (evt)  |
+| rawUploadAndRun | function | function (txt, filename)  |
 | fileDump | function | function (evt)  |
 | fileDelete | function | function (evt)  |
 | fileRun | function | function (evt)  |

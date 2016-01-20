@@ -257,6 +257,23 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
             this.send('file.close()');
             this.send('node.compile("' + filename + '")');
         },
+        rawUploadAndRun: function(txt, filename) {
+            //filename = this.cleanupFilename();
+            filename += ".lua";
+            
+            // split on newlines and upload per line
+            this.send('file.open("' + filename + '", "w")');
+            var txtArr = txt.split(/\n/g);
+            for(var i in txtArr) {
+                var line = txtArr[i];
+                //var lineEsc = line.replace(/"/g, '\\"');
+                this.send('file.writeline([[' + line + ']])')
+            }
+            this.send('file.close()');
+            //this.send('node.compile("' + filename + '")');
+            this.send('dofile("' + filename + '")');
+            
+        },
         fileDump: function(evt) {
             $(evt.currentTarget).popover('hide');
             var filename = this.cleanupFilename();
@@ -267,9 +284,22 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
             }
             
             filename += ".lua";
+            /*
             this.send('file.open("' + filename + '", "r")');
             this.send('print(file.read())');
             this.send('file.close()');
+            */
+            
+            // create a file read script as temp file. save that file.
+            // then run it. that way the dump is after everything so
+            // folks can cut/paste cleanly
+            var tmpFile = "" +
+            'file.open("' + filename + '", "r")\n' +
+            'print(file.read())\n' +
+            'file.close()\n'
+            '';
+            this.rawUploadAndRun(tmpFile, "tmp");
+            
 
         },
         fileDelete: function(evt) {
