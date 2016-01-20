@@ -156,7 +156,9 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
             // popovers
             $('#' + this.id + ' .panel-heading .btn').popover();
             
-           this.setupUploadRun();
+            this.setupUploadRun();
+            
+            this.setScriptFromTemporaryFile();
             
             // see if startup script
             //.setupStartup();
@@ -445,7 +447,21 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
                     $('#' + that.id + ' .luaeditor-run').removeClass('active');
                 }, 200);
             }
+            // should we really do this on every keystroke
+            this.saveTemporaryFile();
                 
+        },
+        saveTemporaryFile: function(evt) {
+            localStorage.setItem(this.id + "-tempfile", this.getScript()); 
+            console.log("saved temp file");
+        },
+        getTemporaryFile: function() {
+            return localStorage.getItem(this.id + "-tempfile");    
+        },
+        setScriptFromTemporaryFile: function() {
+            this.jscript = this.getTemporaryFile();
+            if (this.jscript)
+                $('#' + this.id + ' .luaeditor-maineditor').val(this.jscript);
         },
         showData: function(datatxt) {
             $('#com-chilipeppr-widget-modal-macro-view .modal-body textarea').val(datatxt);

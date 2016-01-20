@@ -121,6 +121,9 @@ The table below shows, in order, the methods and properties inside the widget/el
 | getScript | function | function ()  |
 | runScript | function | function (macroStr, helpTxt)  |
 | jscriptKeypress | function | function (evt)  |
+| saveTemporaryFile | function | function (evt)  |
+| getTemporaryFile | function | function ()  |
+| setScriptFromTemporaryFile | function | function ()  |
 | showData | function | function (datatxt)  |
 | saveScript | function | function ()  |
 | deleteRecentFiles | function | function ()  |
