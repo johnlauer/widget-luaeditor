@@ -242,7 +242,7 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
             this.send('file.open("' + filename + '", "r")');
             this.send('fileline = file.readline()');
             this.send('while fileline do');
-            this.send('  print(string.gsub(fileline, "\\n$", ""))');
+            this.send('    print(string.sub(fileline, 0, string.len(fileline) - 1))');
             this.send('  fileline = file.readline()');
             this.send('end');
             this.send('file.close()');
