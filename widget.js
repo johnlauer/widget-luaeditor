@@ -117,6 +117,7 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
             // see if startup script
             //.setupStartup();
             
+            
             console.log(this.name + " done loading.");
         },
         /**
