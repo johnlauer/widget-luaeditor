@@ -25,12 +25,16 @@ requirejs.config({
         // Example of how to define the key (you make up the key) and the URL
         // Make sure you DO NOT put the .js at the end of the URL
         // SmoothieCharts: '//smoothiecharts.org/smoothie',
-        AceEditor: '//cdn.jsdelivr.net/ace/1.2.3/min/ace.js',
-        AceEditorLua: '//cdn.jsdelivr.net/ace/1.2.3/min/mode-lua.js',
+        //AceEditor: '//cdn.jsdelivr.net/ace/1.2.3/min/ace',
+        ace: '//ace.c9.io/build/src/ace',
+        aceAutoCompletion: '//ace.c9.io/build/src/ext-language_tools',
+        AceEditorLua: '//cdn.jsdelivr.net/ace/1.2.3/min/mode-lua',
     },
     shim: {
         // See require.js docs for how to define dependencies that
         // should be loaded before your script/widget.
+        AceEditorLua: ["ace"],
+        aceAutoCompletion: ["ace"]
     }
 });
 
@@ -66,7 +70,7 @@ cprequire_test(["inline:com-chilipeppr-widget-luaeditor"], function(myWidget) {
 } /*end_test*/ );
 
 // This is the main definition of your widget. Give it a unique name.
-cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other dependencies here */ ], function() {
+cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", "aceAutoCompletion", /* other dependencies here */ ], function() {
     return {
         /**
          * The ID of the widget. You must define this and make it unique.
@@ -118,6 +122,7 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
             // '/com-chilipeppr-elem-dragdrop/ondropped': 'Example: We subscribe to this signal at a higher priority to intercept the signal. We do not let it propagate by returning false.'
         },
         jscript: null, // contains the javascript macro that the user is working with
+        editor: null, // holds the Ace editor object
         init: function () {
 
             this.forkSetup();
@@ -145,13 +150,48 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
             
             this.setupUploadRun();
             
-            this.setScriptFromTemporaryFile();
+            
+            
+            setTimeout(this.loadAce.bind(this), 2000);
             
             // see if startup script
             //.setupStartup();
             
             
             console.log(this.name + " done loading.");
+        },
+        loadAce: function() {
+            console.log("trying to get ace. ace:", ace);
+            //require("ace/mode/text_highlight_rules", function(xace) {
+            if (ace) { // && 'setValue' in ace) {
+                console.log("got ace. ace:", ace);
+                var editor = ace.edit("editor");
+                editor.setTheme("ace/theme/monokai");
+                editor.getSession().setMode("ace/mode/lua");
+                editor.getSession().setTabSize(2);
+                editor.getSession().setUseSoftTabs(true);
+                document.getElementById('editor').style.fontSize='13px';
+                this.editor = editor;
+                this.setScriptFromTemporaryFile();
+                
+                editor.commands.addCommand({
+                    name: 'mySave',
+                    bindKey: {win: 'Ctrl-S',  mac: 'Command-S'},
+                    exec: this.saveScript.bind(this),
+                    readOnly: false // false if this command should not apply in readOnly mode
+                });
+                
+                editor.setOptions({
+                    enableBasicAutocompletion: true,
+                    enableSnippets: true,
+                    enableLiveAutocompletion: true
+                });
+
+            } else {
+                console.log("ace is currently undefined so retry later");
+                setTimeout(this.loadAce.bind(this), 1000);
+            }
+         
         },
         /**
          * Setup the Upload -> Run button
@@ -427,7 +467,8 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
         },
 
         getScript: function() {
-            this.jscript = $('#' + this.id + ' .luaeditor-maineditor').val();
+            //this.jscript = $('#' + this.id + ' .luaeditor-maineditor').val();
+            this.jscript = this.editor.getValue();
             return this.jscript;
         },
         runScript: function(macroStr, helpTxt) {
@@ -484,8 +525,11 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
         },
         setScriptFromTemporaryFile: function() {
             this.jscript = this.getTemporaryFile();
-            if (this.jscript)
+            if (this.jscript) {
                 $('#' + this.id + ' .luaeditor-maineditor').val(this.jscript);
+            
+                this.editor.setValue(this.jscript);
+            }
         },
         showData: function(datatxt) {
             $('#com-chilipeppr-widget-modal-macro-view .modal-body textarea').val(datatxt);
@@ -495,6 +539,12 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
         saveScript: function() {
             
             $('#' + this.id + ' .luaeditor-save').popover('hide');
+            
+            $('#' + this.id + ' .luaeditor-save').addClass('active');
+            var that = this;
+            setTimeout(function() {
+                $('#' + that.id + ' .luaeditor-save').removeClass('active');
+            }, 500);
             
             var fileStr = this.getScript();
             
@@ -648,7 +698,8 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", /* other
         },
         loadJscript: function(txt) {
             //this.jscript = txt;
-            $('#' + this.id + ' .luaeditor-maineditor').val(txt);
+            //$('#' + this.id + ' .luaeditor-maineditor').val(txt);
+            this.editor.setValue(txt);
             console.log("loaded script into main editor textarea");
         },
         setupSamples: function() {

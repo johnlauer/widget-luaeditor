@@ -101,7 +101,9 @@ The table below shows, in order, the methods and properties inside the widget/el
 | foreignPublish | object | Please see docs above.<br><br>Document the foreign publish signals, i.e. signals owned by other widgetsor elements, that this widget/element publishes to. |
 | foreignSubscribe | object | Please see docs above.<br><br>Document the foreign subscribe signals, i.e. signals owned by other widgetsor elements, that this widget/element subscribes to. |
 | jscript | object |  |
+| editor | object |  |
 | init | function | function ()  |
+| loadAce | function | function ()  |
 | setupUploadRun | function | function () <br><br>Setup the Upload -> Run button |
 | onOpenUploadRunRegion | function | function (evt)  |
 | fileUploadAndRun | function | function (evt)  |
