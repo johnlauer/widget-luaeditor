@@ -1,6 +1,39 @@
 /* global macro requirejs cprequire cpdefine chilipeppr THREE */
 // ignore this errormessage:
 
+requirejs.config({
+    /*
+    Dependencies can be defined here. ChiliPeppr uses require.js so
+    please refer to http://requirejs.org/docs/api.html for info.
+    
+    Most widgets will not need to define Javascript dependencies.
+    
+    Make sure all URLs are https and http accessible. Try to use URLs
+    that start with // rather than http:// or https:// so they simply
+    use whatever method the main page uses.
+    
+    Also, please make sure you are not loading dependencies from different
+    URLs that other widgets may already load like jquery, bootstrap,
+    three.js, etc.
+    
+    You may slingshot content through ChiliPeppr's proxy URL if you desire
+    to enable SSL for non-SSL URL's. ChiliPeppr's SSL URL is
+    https://i2dcui.appspot.com which is the SSL equivalent for
+    http://chilipeppr.com
+    */
+    paths: {
+        // Example of how to define the key (you make up the key) and the URL
+        // Make sure you DO NOT put the .js at the end of the URL
+        // SmoothieCharts: '//smoothiecharts.org/smoothie',
+        AceEditor: '//cdn.jsdelivr.net/ace/1.2.3/min/ace.js',
+        AceEditorLua: '//cdn.jsdelivr.net/ace/1.2.3/min/mode-lua.js',
+    },
+    shim: {
+        // See require.js docs for how to define dependencies that
+        // should be loaded before your script/widget.
+    }
+});
+
 // ChiliPeppr Widget/Element Javascript
 cprequire_test(["inline:com-chilipeppr-widget-luaeditor"], function(myWidget) {
 
