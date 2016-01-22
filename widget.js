@@ -127,6 +127,7 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", "aceAuto
 
             this.forkSetup();
             
+            $('#' + this.id + ' .luaeditor-new').click(this.fileNew.bind(this));
             $('#' + this.id + ' .luaeditor-run').click(this.runScript.bind(this));
             
             // saveScript
@@ -160,17 +161,21 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", "aceAuto
             
             console.log(this.name + " done loading.");
         },
+        /**
+         * The DOM ID of the element that should be the Ace Editor
+         */
+        aceId: "com-chilipeppr-widget-tab-nodemcu-firmware",
         loadAce: function() {
             console.log("trying to get ace. ace:", ace);
             //require("ace/mode/text_highlight_rules", function(xace) {
             if (ace) { // && 'setValue' in ace) {
                 console.log("got ace. ace:", ace);
-                var editor = ace.edit("editor");
+                var editor = ace.edit(this.aceId);
                 editor.setTheme("ace/theme/monokai");
                 editor.getSession().setMode("ace/mode/lua");
                 editor.getSession().setTabSize(2);
                 editor.getSession().setUseSoftTabs(true);
-                document.getElementById('editor').style.fontSize='13px';
+                //document.getElementById('editor').style.fontSize='13px';
                 this.editor = editor;
                 this.setScriptFromTemporaryFile();
                 
@@ -252,6 +257,29 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", "aceAuto
             } else {
                 //.flashMsg("Provide a Filename", "You need to provide a filename before you can upload and run.");
             }
+        },
+        fileNewCtr: 0,
+        fileNew: function(evt) {
+            console.log("fileNew. evt:", evt);
+            // create a new unnamed file in the editor
+            this.fileNewCtr++;
+            var filename = "unnamed" + this.fileNewCtr;
+            var tabEl = $('#' + this.id + ' .panel-body .nav-tabs');
+            var tmpltEl = tabEl.find('.li-template').clone();
+            tmpltEl.removeClass("active");
+            tmpltEl.removeClass("li-template");
+            tmpltEl.find(".tab-file-name").text(filename);
+            var id = 'com-chilipeppr-widget-tab-nodemcu-' + filename;
+            tmpltEl.find("a").prop('href', '#' + id);
+            tabEl.append(tmpltEl);
+            
+            // now add the div that becomes the editor
+            var editEl = $('<div role="tabpanel" id="' + 
+                id + '" class="tab-pane luaeditor-maineditor"></div>'
+            );
+            $('#' + this.id + ' .panel-body').append(editEl);
+            
+            tmpltEl.tab('show');
         },
         fileUploadAndRun: function(evt) {
             this.fileUpload();

@@ -103,9 +103,12 @@ The table below shows, in order, the methods and properties inside the widget/el
 | jscript | object |  |
 | editor | object |  |
 | init | function | function ()  |
+| aceId | string | "com-chilipeppr-widget-tab-nodemcu-firmware"<br><br>The DOM ID of the element that should be the Ace Editor |
 | loadAce | function | function ()  |
 | setupUploadRun | function | function () <br><br>Setup the Upload -> Run button |
 | onOpenUploadRunRegion | function | function (evt)  |
+| fileNewCtr | number |  |
+| fileNew | function | function (evt)  |
 | fileUploadAndRun | function | function (evt)  |
 | fileUpload | function | function (evt)  |
 | rawUploadAndRun | function | function (txt, filename)  |
