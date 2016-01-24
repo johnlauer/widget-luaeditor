@@ -103,12 +103,27 @@ The table below shows, in order, the methods and properties inside the widget/el
 | jscript | object |  |
 | editor | object |  |
 | init | function | function ()  |
-| aceId | string | "com-chilipeppr-widget-tab-nodemcu-firmware"<br><br>The DOM ID of the element that should be the Ace Editor |
-| loadAce | function | function ()  |
-| setupUploadRun | function | function () <br><br>Setup the Upload -> Run button |
-| onOpenUploadRunRegion | function | function (evt)  |
+| loadPrevFiles | function | function ()  |
+| getDeviceFileList | function | function ()  |
+| aceId | string | "com-chilipeppr-luaeditor"<br><br>The DOM ID of the element that should be the Ace Editor |
+| aceSessionName | object |  |
+| aceSessions | object |  |
+| aceCurrentSession | object |  |
+| aceIsLoaded | boolean |  |
+| loadAce | function | function (sessionName)  |
 | fileNewCtr | number |  |
-| fileNew | function | function (evt)  |
+| fileNew | function | function (evt, existing)  |
+| createFileTab | function | function (id, filename)  |
+| onFileTabShow | function | function (e)  |
+| onFileTabClose | function | function (e)  |
+| renameFileNeedSaveAfter | boolean |  |
+| renameFileShow | function | function (evt)  |
+| renameFileHide | function | function (evt)  |
+| renameFile | function | function ()  |
+| getActiveFile | function | function ()  |
+| fileLocalSave | function | function (evt)  |
+| refreshFileList | function | function () <br><br>Update the file pulldown to show the new files in localStorage. |
+| fileLocalOpen | function | function (fi)  |
 | fileUploadAndRun | function | function (evt)  |
 | fileUpload | function | function (evt)  |
 | rawUploadAndRun | function | function (txt, filename)  |
@@ -116,6 +131,8 @@ The table below shows, in order, the methods and properties inside the widget/el
 | fileDelete | function | function (evt)  |
 | fileRun | function | function (evt)  |
 | cleanupFilename | function | function ()  |
+| setupUploadRun | function | function () <br><br>Setup the Upload -> Run button |
+| onOpenUploadRunRegion | function | function (evt)  |
 | onCloseUploadRunRegion | function | function ()  |
 | flashMsg | function | function (title, msg)  |
 | setupStartup | function | function ()  |

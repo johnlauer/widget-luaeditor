@@ -45,7 +45,20 @@
 }
 
 #com-chilipeppr-widget-luaeditor .nav-tabs>li>a {
-    padding: 2px 18px 2px 6px;
+    margin:2px 0px 0px 2px;
+    padding: 0px 18px 2px 6px;
+}
+
+#com-chilipeppr-widget-luaeditor .lastModifyDate {
+    /*font-style: italic;*/
+    color: #999999;
+}
+
+#com-chilipeppr-widget-luaeditor .devicefilename-region {
+    margin:8px 0px 0px 0px;
+    padding:0px 8px 8px 8px;
+    border:1px solid #46b8da;
+    box-shadow: 0px 0px 1px 0px #46b8da; /* Standard */
 }
 
 #com-chilipeppr-widget-luaeditor .close {
@@ -71,6 +84,11 @@
 
 .luaeditor-maineditor {
     font-size:13px;
+    height: 100%;
+    
+}
+.luaeditor-maineditor.empty {
+    opacity: 0;
 }
     </style>
 
@@ -143,7 +161,10 @@ cprequire_test(["inline:com-chilipeppr-widget-luaeditor"], function(myWidget) {
 
     // init my widget
     myWidget.init();
-    myWidget.resize();
+    $('title').html(myWidget.name);
+    
+    //$('#' + myWidget.id + ' .alert-devicefilename').removeClass("hidden");
+    $('#' + myWidget.id + ' .luaeditor-uploadrun').trigger("click");
 
 } /*end_test*/ );
 
@@ -203,161 +224,502 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", "aceAuto
         editor: null, // holds the Ace editor object
         init: function () {
 
-            this.forkSetup();
             
             $('#' + this.id + ' .luaeditor-new').click(this.fileNew.bind(this));
             $('#' + this.id + ' .luaeditor-run').click(this.runScript.bind(this));
             
             // saveScript
-            $('#' + this.id + ' .luaeditor-save').click(this.saveScript.bind(this));
+            //$('#' + this.id + ' .luaeditor-save').click(this.saveScript.bind(this));
+            $('#' + this.id + ' .luaeditor-save').click(this.fileLocalSave.bind(this));
             
             // setup del files
             $('#' + this.id + ' .recent-file-delete').click( this.deleteRecentFiles.bind(this));
 
-            this.buildRecentFileMenu();
+            //this.buildRecentFileMenu();
             
             // capture ctrl+enter on textarea
             $('#' + this.id + ' .luaeditor-maineditor').keypress(this.jscriptKeypress.bind(this));
             
             // samples
-            this.setupSamples();
+            //this.setupSamples();
             
-            this.makeTextareaAcceptTabs();
+            //this.makeTextareaAcceptTabs();
             
             // popovers
             $('#' + this.id + ' .panel-heading .btn').popover();
             
             this.setupUploadRun();
             
+            this.refreshFileList();
             
+            this.loadPrevFiles();
             
             setTimeout(this.loadAce.bind(this), 2000);
             
             // see if startup script
             //.setupStartup();
             
+            this.forkSetup();
+            
+            
             
             console.log(this.name + " done loading.");
+        },
+        loadPrevFiles: function() {
+            // when we load, we try to reload previous files and tabs that
+            // were open
+            console.log("loading previous files");
+            var prev = localStorage.getItem(this.id + "-prev");
+            if (prev && prev.length > 0) {
+                prev = JSON.parse(prev);
+            } else {
+                // there is no previous set of files
+                // open a new unnamed file
+                this.fileNew();
+            }
+            
+        },
+        getDeviceFileList: function() {
+            var code = `l = file.list()
+str = "{\"files\":["
+for k,v in pairs(l) do
+  str = str .. "{\"name\":\"" .. k .. "\", \"size\":" .. v .. "}, "
+end
+str = string.sub(str, 0, string.len(str) - 2)
+str = str .. "]}"
+print(str)
+str = nil
+l = nil`;    
+
+            var jsoncode = `
+            -- json file list
+l = file.list()
+str = "{\"files\":["
+for k,v in pairs(l) do
+  str = str .. "{\"name\":\"" .. k .. "\", \"size\":" .. v .. "}, "
+end
+str = string.sub(str, 0, string.len(str) - 2)
+str = str .. "]}"
+print(str)
+str = nil
+l = nil
+`;
         },
         /**
          * The DOM ID of the element that should be the Ace Editor
          */
-        aceId: "com-chilipeppr-widget-tab-nodemcu-firmware",
-        loadAce: function() {
-            console.log("trying to get ace. ace:", ace);
+        aceId: "com-chilipeppr-luaeditor",
+        aceSessionName: null,
+        aceSessions: {},
+        aceCurrentSession: null,
+        aceIsLoaded: false,
+        loadAce: function(sessionName) {
+
+            //if (id && id.length > 0) this.aceId = id;
+            if (sessionName && sessionName.length > 0) {
+                this.aceSessionName = sessionName;
+            }
+            
+            console.log("trying to get ace. ace:", ace, " aceId:", this.aceId);
             //require("ace/mode/text_highlight_rules", function(xace) {
             if (ace) { // && 'setValue' in ace) {
                 console.log("got ace. ace:", ace);
-                var editor = ace.edit(this.aceId);
-                editor.setTheme("ace/theme/monokai");
-                editor.getSession().setMode("ace/mode/lua");
-                editor.getSession().setTabSize(2);
-                editor.getSession().setUseSoftTabs(true);
-                //document.getElementById('editor').style.fontSize='13px';
-                this.editor = editor;
-                this.setScriptFromTemporaryFile();
                 
-                editor.commands.addCommand({
-                    name: 'mySave',
-                    bindKey: {win: 'Ctrl-S',  mac: 'Command-S'},
-                    exec: this.saveScript.bind(this),
-                    readOnly: false // false if this command should not apply in readOnly mode
+                if (this.aceIsLoaded) {
+                    console.log("You are asking Ace to load a 2nd time, but we are already loaded.");
+                    //return;
+                } else {
+                    // load ace
+                    var editor = ace.edit(this.aceId);
+                    editor.setTheme("ace/theme/monokai");
+                    //document.getElementById('editor').style.fontSize='13px';
+                    this.editor = editor;
+                    //this.setScriptFromTemporaryFile();
+                    
+                    editor.commands.addCommand({
+                        name: 'mySave',
+                        bindKey: {win: 'Ctrl-S',  mac: 'Command-S'},
+                        exec: this.fileLocalSave.bind(this),
+                        readOnly: false // false if this command should not apply in readOnly mode
+                    });
+                    
+                    editor.setOptions({
+                        enableBasicAutocompletion: true,
+                        enableSnippets: true,
+                        enableLiveAutocompletion: true
+                    });
+                    
+                    editor.on("changeSession", function(e) {
+                        console.log("got editor changeSession");
+                    });
+                    
+                    this.resize();
+                    this.aceIsLoaded = true;
+                }
+            
+                // now create the session just for this document
+                //var docu = ace.createEditSession('', "ace/mode/lua");
+                
+                // see if we have a session already for this
+                if (this.aceSessionName in this.aceSessions) {
+                    // we actually already have a session, cool
+                    this.aceCurrentSession = this.aceSessions[this.aceSessionName];
+                    
+                } else {
+                    // we don't have a session, so need to create one
+                    this.aceCurrentSession = new ace.EditSession(this.aceSessionName, "ace/mode/lua")
+                    this.aceSessions[this.aceSessionName] = this.aceCurrentSession;
+                    
+                }
+
+                this.editor.setSession(this.aceCurrentSession);
+                //editor.getSession().setMode("ace/mode/lua");
+                this.editor.getSession().setTabSize(2);
+                this.editor.getSession().setUseSoftTabs(true);
+                this.editor.getSession().on('change', function(e) {
+                    // e.type, etc
+                    console.log("got change on editor. e:", e);
                 });
                 
-                editor.setOptions({
-                    enableBasicAutocompletion: true,
-                    enableSnippets: true,
-                    enableLiveAutocompletion: true
+                this.editor.getSession().selection.on('changeSelection', function(e) {
+                    console.log("got changeSelection on editor. e:", e); 
                 });
+                console.log("ace session created:", this.aceCurrentSession);
 
             } else {
                 console.log("ace is currently undefined so retry later");
                 setTimeout(this.loadAce.bind(this), 1000);
             }
+            
+            
          
         },
-        /**
-         * Setup the Upload -> Run button
-         */
-        setupUploadRun: function() {
-            $('#' + this.id + ' .luaeditor-uploadrun').click(this.onOpenUploadRunRegion.bind(this));
-             // activate alert
-            $('#' + this.id + ' .alert-devicefilename')
-                //.alert()
-                //.addClass("hidden")
-                .on('closed.bs.alert', this.onCloseUploadRunRegion.bind(this));
-            // onchange
-            var boxEl = $('#' + this.id + ' .alert-devicefilename');
-            boxEl.on('change', this.cleanupFilename.bind(this));
-            
-            // setup individual buttons
-            $('#' + this.id + ' .btn-fileuploadrun').click(this.fileUploadAndRun.bind(this));
-            $('#' + this.id + ' .btn-fileupload').click(this.fileUpload.bind(this));
-            $('#' + this.id + ' .btn-filerun').click(this.fileRun.bind(this));
-            $('#' + this.id + ' .btn-filedump').click(this.fileDump.bind(this));
-            $('#' + this.id + ' .btn-filedelete').click(this.fileDelete.bind(this));
-            
-
-        },
-        onOpenUploadRunRegion: function(evt) {
-            console.log("uploadRun called. evt:", evt);
-            
-            var btnEl = $('#' + this.id + ' .luaeditor-uploadrun');
-            btnEl.popover('hide');
-            
-            // see if filename box is showing, if not show it
-            var boxEl = $('#' + this.id + ' .alert-devicefilename');
-            if (boxEl.hasClass("hidden")) {
-                boxEl.removeClass("hidden");
-                btnEl.addClass("active")
-
-            } else {
-                
-                boxEl.addClass("hidden");
-                btnEl.removeClass("active");
-            }
-
-            // since we size our height ourselves, we better trigger resize cuz
-            // we just added height
-            this.resize();
-
-            
-            // see if filename, and if not show flash message
-            var fileEl = $('#' + this.id + ' .devicefilename');
-            var fileName = fileEl.val();
-            if (fileName && fileName.length > 0) {
-                // good there's a filename
-                // make sure there's no .lua extension
-                if (fileName.match(/\.lua$/i)) {
-                    fileEl.val(fileName.replace(/\.lua$/i, ""));
-                    fileName = fileEl.val();
-                }
-            } else {
-                //.flashMsg("Provide a Filename", "You need to provide a filename before you can upload and run.");
-            }
-        },
+        
         fileNewCtr: 0,
-        fileNew: function(evt) {
+        fileNew: function(evt, existing) {
+            
             console.log("fileNew. evt:", evt);
+            if (evt) $(evt.currentTarget).popover('hide');
+            
             // create a new unnamed file in the editor
             this.fileNewCtr++;
             var filename = "unnamed" + this.fileNewCtr;
+            var id = 'com-chilipeppr-widget-nodemcu-file-' + filename;
+            
+            // create the tab that represents our file
+            this.createFileTab(id, filename);
+            
+            // load the ace editor for this new file
+            this.loadAce(id);
+            
+            this.resize();
+        },
+        createFileTab: function(id, filename) {
+            // add the tab to the top
             var tabEl = $('#' + this.id + ' .panel-body .nav-tabs');
-            var tmpltEl = tabEl.find('.li-template').clone();
+            //var tmpltEl = tabEl.find('.li-template').clone();
+            var tmpltEl = $(`
+<li class="active li-template"><a 
+    href="#com-chilipeppr-widget-tab-nodemcu-firmware" role="tab" 
+    data-toggle="tab"><span 
+    class="tab-file-name">udp.lua</span></a><button 
+    type="button" class="close" 
+    data-dismiss="alert" aria-label="Close"><span 
+    aria-hidden="true">×</span></button>
+</li>`);
             tmpltEl.removeClass("active");
             tmpltEl.removeClass("li-template");
-            tmpltEl.find(".tab-file-name").text(filename);
-            var id = 'com-chilipeppr-widget-tab-nodemcu-' + filename;
-            tmpltEl.find("a").prop('href', '#' + id);
+            
+            filename = filename.replace(/\.lua$/, "");
+            tmpltEl.find(".tab-file-name").text(filename + ".lua");
+            tmpltEl.find("a").prop('href', '#' + id); //.addClass(id);
+            //tmpltEl.find("a").attr("data-fileid", id);
+            
             tabEl.append(tmpltEl);
             
-            // now add the div that becomes the editor
-            var editEl = $('<div role="tabpanel" id="' + 
-                id + '" class="tab-pane luaeditor-maineditor"></div>'
-            );
-            $('#' + this.id + ' .panel-body').append(editEl);
+            tmpltEl.find("a").tab('show')
+                .on('shown.bs.tab', this.onFileTabShow.bind(this));
+            tmpltEl.find(".close").click(this.onFileTabClose.bind(this));
             
-            tmpltEl.tab('show');
+            // make sure editor doesn't show as empty
+            $('#' + this.id + ' .luaeditor-maineditor').removeClass("empty");
+
+            // populate our name into the rename box
+            $('#' + this.id + ' .devicefilename').val(filename);
+
+        },
+        onFileTabShow: function(e) {
+            console.log("tab got shown. tab:", e.target, "prev tab:", e.relatedTarget);
+            var tabEl = $(e.target); 
+            var fileId = tabEl.attr("href");
+            fileId = fileId.replace("#", "");
+            var filename = tabEl.find('.tab-file-name').text();
+            filename = filename.replace(/\.lua$/, "");
+            //that.editor = ace.edit(id);
+            console.log("id:", fileId, "filename:", filename);
+            
+            // set the file name in the edit file box (only needed when they rename
+            // so could set later)
+            $('#' + this.id + ' .devicefilename').val(filename);
+            
+            // set the active session of the editor. this is the most important
+            // part
+            this.editor.setSession(this.aceSessions[fileId]);
+            
+            
+            console.log("set active session of:", this.aceSessions[fileId], " from overall sessions:", this.aceSessions);
+        
+        },
+        onFileTabClose: function(e) {
+            console.log("onFileTabClose. e:", e);
+            this.aceCurrentSession.$stopWorker();
+            
+            var tabEl = $(e.currentTarget).parent().find('a');
+            console.log("tab that was closed. tabEl:", tabEl);
+            var fileId = tabEl.attr("href");
+            fileId = fileId.replace("#", "");
+            
+            delete this.aceSessions[fileId];
+            
+            console.log("after delete from array aceSessions:", this.aceSessions);
+            
+            // see if this was the last tab to close
+            if (Object.keys(this.aceSessions).length == 0) {
+                // it was the last tab
+                this.editor.setValue("");
+                $('#' + this.id + ' .luaeditor-maineditor').addClass("empty");
+            } else if (tabEl.parent().hasClass("active")) {
+                // see if this was the currently active tab, cuz if
+                // it was we need to make some other tab active
+                // maybe just set the first tab as active
+                $('#' + this.id + ' .nav-tabs li:not(.active) a:first').tab('show');
+                
+            } else {
+                // do nothing
+            }
+
+        },
+        renameFileNeedSaveAfter: false,
+        renameFileShow: function(evt) {
+            if (evt && 'needSaveAfter' in evt && evt.needSaveAfter) {
+                // we are showing the rename box and need to save afterwards
+                // so mark a bool that needs to get set to false later
+                
+            }
+            $('#' + this.id + " .devicefilename-region").removeClass("hidden");
+            $('#' + this.id + " .devicefilename").select();
+            this.resize();
+        },
+        renameFileHide: function(evt) {
+            $('#' + this.id + " .devicefilename-region").addClass("hidden");
+            this.resize();
+        },
+        renameFile: function() {
+            // when this is called from the go button we need
+            // to change lots of id's
+            var newfilename = $("#" + this.id + ' .devicefilename').val();
+            var newid = "com-chilipeppr-widget-nodemcu-file-" + newfilename;
+            var af = this.getActiveFile();
+            console.log("renameFile. old name:", af.filename, "new file:", newfilename);
+            console.log("old id:", af.id, "new id:", newid);
+
+            // change text on tab
+            var tabSpan = $("#" + this.id + ' a[href="#' + af.id + '"] .tab-file-name');
+            var tabAEl = $("#" + this.id + ' a[href="#' + af.id + '"] ');
+            console.log("current data-fileid", tabAEl.attr('data-fileid'));
+            console.log("tabAEl:", tabAEl);
+
+            tabSpan.text(newfilename + ".lua");
+            //tabSpan.data("fileid", newid);
+            //tabAEl.removeClass(af.id);
+            //tabAEl.addClass(newid);
+            //tabAEl.data('fileidold', af.id);
+            tabAEl.attr('data-fileid', newid);
+            tabAEl.attr("href", '#' + newid);
+
+            // change key name in this.aceSessions
+            this.aceSessions[newid] = this.aceSessions[af.id];
+            delete this.aceSessions[af.id];
+            
+            // change id on editor div
+            //var editorEl = $("#" + this.id + ' #' + af.id);
+            //editorEl.attr("id", newid);
+            //editorEl.data('filename', newfilename)
+            
+            // reactive ace editor
+            //this.editor = ace.edit(newid);
+            
+            // now save the file
+            this.fileLocalSave();
+            
+            // hide the region
+            this.renameFileHide();
+        },
+        getActiveFile: function() {
+            // see which tab is active
+            //var activeEl = $('#' + this.id + " .luaeditor-maineditor.active");
+            var activeTabEl = $('#' + this.id + " .nav-tabs li.active a");
+            console.log("activeTabEl:", activeTabEl);
+            //var id = activeTabEl.attr('data-fileid');
+            
+            var id = activeTabEl.attr('href');
+            id = id.replace("#", "");
+            var filename = activeTabEl.find('.tab-file-name').text();
+            console.log("id:", id, "activeTabEl:", activeTabEl);
+            var content = this.editor.getSession().getValue();
+            return { filename: filename, id: id, content: content };
+        },
+        fileLocalSave: function(evt) {
+            
+            console.log("fileLocalSave");
+            
+            $('#' + this.id + ' .luaeditor-save').popover('hide');
+            
+            $('#' + this.id + ' .luaeditor-save').addClass('active');
+            var that = this;
+            setTimeout(function() {
+                $('#' + that.id + ' .luaeditor-save').removeClass('active');
+            }, 500);
+            
+            var activeFile = this.getActiveFile();
+            console.log("activeFile:", activeFile);
+            
+            // check the file name
+            if (activeFile.filename.match(/^unnamed/i)) {
+                // it is still unnamed. have then name it
+                this.status("You need to give your script a name.");
+                this.renameFileShow({needSaveAfter: true});
+                return;
+            }
+            
+            if (activeFile.content.length == 0) {
+                this.status("Your script seems to be empty. Not saving.");
+                return;
+            }
+                
+            activeFile.lastModified = new Date()
+            //var afStr = JSON.stringify(activeFile);
+            //var afStr = JSON.stringify(activeFile.content);
+            var afStr = activeFile.content;
+            
+            console.log("saving file:", activeFile);
+            localStorage.setItem(activeFile.id, afStr);
+            
+            // now append the file index for this widget in localStorage
+            // hopefully this never gets corrupted
+            var fileindex = localStorage.getItem(this.id + "-fileindex");
+            if (fileindex && fileindex.length > 0) {
+                // we got an index, great
+                fileindex = JSON.parse(fileindex);
+                
+            } else {
+                // no file index, create one
+                fileindex = {};
+            }
+            
+            var version = 1;
+            
+            // see if there was a previous version in index
+            if (activeFile.id in fileindex && 
+                'version' in fileindex[activeFile.id]) {
+                version = fileindex[activeFile.id].version + 1;
+            }
+            
+            var filesize = parseInt(activeFile.content.length / 1024);
+            if (filesize < 1) filesize = 1;
+            
+            // add index to array
+            fileindex[activeFile.id] = {
+                filename: activeFile.filename,
+                lastModified: new Date(),
+                version: version,
+                size: filesize
+            };
+            
+            // write it out
+            var fileindexStr = JSON.stringify(fileindex);
+            console.log("write fileindex:", fileindexStr);
+            localStorage.setItem(this.id + "-fileindex", fileindexStr);
+            
+            //this.createRecentFileEntry(fileStr, info);
+            this.status('Locally saved your file "' + activeFile.filename + '". Retrieve it from upper right pulldown.');
+
+            this.refreshFileList();
+        },
+        /**
+         * Update the file pulldown to show the new files in localStorage.
+         */
+        refreshFileList: function() {
+            
+            // debug wipe list
+            //localStorage.removeItem(this.id + "-fileindex");
+            
+            var fileindex = localStorage.getItem(this.id + "-fileindex");
+            if (fileindex && fileindex.length > 0) {
+                // we got an index, great
+                fileindex = JSON.parse(fileindex);
+                console.log("fileindex:", fileindex);
+            } else {
+                // no file index, create one
+                fileindex = {};
+            }
+            
+            // cleanup prev recent files
+            $('#' + this.id + ' .dropdown-menu-files > li.recent-file-item').remove();
+            
+            var li = $('#' + this.id + ' .dropdown-menu-files > li.recent-files');
+            console.log("listItems:", li);
+            
+            //var ctr = 0;
+            for(var i in fileindex) {
+                var fi = fileindex[i];
+                fi.id = i;
+                var dt = new Date(fi.lastModified);
+                console.log("adding menu:", fi);
+                var newLi = $(
+                    '<li class="recent-file-item"><a href="javascript:">' + fi.filename +
+                    ' <span class="lastModifyDate">' + dt.toLocaleString() + '</span>' +
+                    ' v:' + fi.version + 
+                    ' ' + fi.size + 'KB' +
+                    '</a></li>');
+                    //' <button type="button" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-trash"></span></button></a></li>');
+                newLi.insertAfter(li);
+                var that = this;
+                newLi.click(fi, function(data) {
+                    var key = data.data;
+                    console.log("got recent file click. key:", key, "data:", data);
+                    //that.loadFileFromLocalStorageKey(key);
+                    that.fileLocalOpen(key);
+                });
+
+                //ctr++;
+                //recentName = localStorage.getItem("com-chilipeppr-widget-macro-recent" + ctr + "-name");
+                
+            }
+        },
+        fileLocalOpen: function(fi) {
+            console.log("got fileLocalOpen. fi:", fi);
+            
+            // create a new file in the editor
+
+            // create the tab that represents our file
+            this.createFileTab(fi.id, fi.filename);
+            
+            // get file content
+            var content = localStorage.getItem(fi.id);
+            
+            // create the ace session before we load the ace editor
+            // make sure we store this session by it's id in the main
+            // array of sessions before we call loadAce, that way it
+            // can look for an existing session and use that instead of
+            // creating one
+            var session = new ace.EditSession(content, "ace/mode/lua")
+            this.aceSessions[fi.id] = session;
+
+            // load the ace editor for this new file
+            this.loadAce(fi.id);
+            
+            this.resize();
         },
         fileUploadAndRun: function(evt) {
             this.fileUpload();
@@ -485,6 +847,92 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", "aceAuto
             }
             return fileName;
 
+        },
+        /**
+         * Setup the Upload -> Run button
+         */
+        setupUploadRun: function() {
+            $('#' + this.id + ' .luaeditor-uploadrun').click(this.onOpenUploadRunRegion.bind(this));
+             // activate alert
+            $('#' + this.id + ' .alert-devicefilename')
+                //.alert()
+                //.addClass("hidden")
+                .on('closed.bs.alert', this.onCloseUploadRunRegion.bind(this));
+            // onchange
+            var boxEl = $('#' + this.id + ' .alert-devicefilename');
+            boxEl.on('change', this.cleanupFilename.bind(this));
+            
+            // setup individual buttons
+            $('#' + this.id + ' .btn-fileuploadrun').click(this.fileUploadAndRun.bind(this));
+            $('#' + this.id + ' .btn-fileupload').click(this.fileUpload.bind(this));
+            $('#' + this.id + ' .btn-filerun').click(this.fileRun.bind(this));
+            $('#' + this.id + ' .btn-filedump').click(this.fileDump.bind(this));
+            $('#' + this.id + ' .btn-filedelete').click(this.fileDelete.bind(this));
+            $('#' + this.id + ' .btn-filerename').click(this.renameFileShow.bind(this));
+            
+            // setup the go button on the file rename
+            $('#' + this.id + ' .btn-devicefilenamego').click(this.renameFile.bind(this));
+            var that = this;
+            // setup input box keypress and blur
+            $('#' + this.id + ' .devicefilename').keypress(function(evt) {
+                console.log("keypress. evt:", evt);
+                if (evt.keyCode == 13) {
+                    // enter was hit, so mimic clicking Go
+                    $('#' + that.id + ' .btn-devicefilenamego').trigger("click");
+                }
+            });
+            $('#' + this.id + ' .devicefilename-region').focusout(function(evt) {
+                console.log("got focusout. evt:", evt);
+                //var regionEl = $(evt.currentTarget);
+                //var newTarget = $(evt.relatedTarget);
+                //console.log("regionEl:", regionEl, "newTarget:", newTarget);
+                if (evt.currentTarget == evt.relatedTarget) {
+                    console.log("we got focus to ourselves");
+                } else if ($.contains(evt.currentTarget, evt.relatedTarget)) {
+                    // not hiding cuz still inside ourselves
+                    console.log("not hiding cuz still inside ourselves");
+                } else {
+                    that.renameFileHide();
+                }
+            });
+
+        },
+        onOpenUploadRunRegion: function(evt) {
+            console.log("uploadRun called. evt:", evt);
+            
+            var btnEl = $('#' + this.id + ' .luaeditor-uploadrun');
+            btnEl.popover('hide');
+            
+            // see if filename box is showing, if not show it
+            var boxEl = $('#' + this.id + ' .alert-devicefilename');
+            if (boxEl.hasClass("hidden")) {
+                boxEl.removeClass("hidden");
+                btnEl.addClass("active")
+
+            } else {
+                
+                boxEl.addClass("hidden");
+                btnEl.removeClass("active");
+            }
+
+            // since we size our height ourselves, we better trigger resize cuz
+            // we just added height
+            this.resize();
+
+            
+            // see if filename, and if not show flash message
+            var fileEl = $('#' + this.id + ' .devicefilename');
+            var fileName = fileEl.val();
+            if (fileName && fileName.length > 0) {
+                // good there's a filename
+                // make sure there's no .lua extension
+                if (fileName.match(/\.lua$/i)) {
+                    fileEl.val(fileName.replace(/\.lua$/i, ""));
+                    fileName = fileEl.val();
+                }
+            } else {
+                //.flashMsg("Provide a Filename", "You need to provide a filename before you can upload and run.");
+            }
         },
         onCloseUploadRunRegion: function() {
             $('#' + this.id + ' .luaeditor-uploadrun').removeClass("active");
@@ -798,7 +1246,9 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", "aceAuto
             var wht = wdgt.offset().top + wdgt.height();
             var delta = $(window).height() - wht;
             //console.log("delta:", delta, "wht:", wht);
-            var logEl = $('#' + this.id + ' .luaeditor-maineditor');
+            //var logEl = $('#' + this.id + ' .luaeditor-maineditor');
+            //var logEl = $('#' + this.id + ' .tab-content');
+            var logEl = $('#' + this.id + ' #' + this.aceId);
             var loght = logEl.height();
             logEl.height(loght + delta - 13);
         },
@@ -1098,15 +1548,29 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", "aceAuto
                         data-delay="1000">
                         <span class="glyphicon glyphicon-trash"></span>
                     </button>
+                    <button class="btn btn-default btn-filerename" type="button"
+                        data-container="body" data-toggle="popover" 
+                        data-placement="auto" data-trigger="hover"
+                        data-content="Rename the file." 
+                        data-delay="1000">
+                        Rename <span class="hidden glyphicon glyphicon-edit"></span>
+                    </button>
                     <!--<button class="btn btn-default" type="button">-->
                     <!--    Download -->
                     <!--    <span class="glyphicon glyphicon-floppy-save"></span>-->
                     <!--</button>-->
                 </div>
-                <div class="input-group" style="padding-top:6px;">
-                    <input type="text" class="form-control devicefilename" 
-                    placeholder="myFilenameOnDevice" value="asdf">
-                    <span class="input-group-addon">.lua</span>
+                <div tabindex="0" class="devicefilename-region well hidden">
+                    <p style="padding-top:10px;">Give your file a name. The name will be used on the ESP8266 device as well 
+                    as the name in your local storage file list.</p>
+                    <div class="input-group" style="padding-top:2x;">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default btn-devicefilenamego" type="button">Go!</button>
+                        </span>
+                        <input type="text" class="form-control devicefilename" 
+                        placeholder="myFilenameOnDevice" value="asdf">
+                        <span class="input-group-addon">.lua</span>
+                    </div>
                 </div>
             </div>
             
@@ -1117,27 +1581,31 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", "aceAuto
             <!-- Nav tabs -->
             <ul class="nav nav-tabs" role="tablist">
    
-                <li class="active li-template"><a 
-                href="#com-chilipeppr-widget-tab-nodemcu-firmware" role="tab" 
-                data-toggle="tab"><span class="tab-file-name">udp.lua</span></a><button type="button" class="close" 
-                data-dismiss="alert" aria-label="Close"><span 
-                aria-hidden="true">×</span></button></li>
+                <!--<li class="active li-template"><a -->
+                <!--href="#com-chilipeppr-widget-tab-nodemcu-firmware" role="tab" -->
+                <!--data-toggle="tab"><span class="tab-file-name">udp.lua</span></a><button type="button" class="close" -->
+                <!--data-dismiss="alert" aria-label="Close"><span -->
+                <!--aria-hidden="true">×</span></button></li>-->
                 
-                <li class="xhidden"><a 
-                href="#com-chilipeppr-widget-tab-nodemcu-docs" role="tab" 
-                data-toggle="tab"><span class="tab-file-name">init.lua</span></a><button type="button" class="close" 
-                data-dismiss="alert" aria-label="Close"><span 
-                aria-hidden="true">×</span></button></li>
+                <!--<li class="xhidden"><a -->
+                <!--href="#com-chilipeppr-widget-tab-nodemcu-docs" role="tab" -->
+                <!--data-toggle="tab"><span class="tab-file-name">init.lua</span></a><button type="button" class="close" -->
+                <!--data-dismiss="alert" aria-label="Close"><span -->
+                <!--aria-hidden="true">×</span></button></li>-->
                 
                
             </ul>
             <!-- Tab panes -->
             
-            <!--<textarea class="form-control luaeditor-maineditor hidden" -->
-            <!--placeholder="Enter Lua code Here. Press Run in toolbar to send the Lua script to the selected serial port. Ctrl+Enter is shortcut for run." -->
-            <!--spellcheck="false" rows="5"></textarea>-->
+            <div class="tab-content">
+                <!--<textarea class="form-control luaeditor-maineditor hidden" -->
+                <!--placeholder="Enter Lua code Here. Press Run in toolbar to send the Lua script to the selected serial port. Ctrl+Enter is shortcut for run." -->
+                <!--spellcheck="false" rows="5"></textarea>-->
 
-            <div role="tabpanel" id="com-chilipeppr-widget-tab-nodemcu-firmware" class="tab-pane luaeditor-maineditor"></div>
+                <!--<div role="tabpanel" id="com-chilipeppr-widget-tab-nodemcu-firmware" class="tab-pane active luaeditor-maineditor"></div>-->
+            </div>
+            
+            <div id="com-chilipeppr-luaeditor" class="luaeditor-maineditor"></div>
 
         </div>
         <div class="panel-footer">

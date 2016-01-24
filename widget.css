@@ -27,7 +27,20 @@
 }
 
 #com-chilipeppr-widget-luaeditor .nav-tabs>li>a {
-    padding: 2px 18px 2px 6px;
+    margin:2px 0px 0px 2px;
+    padding: 0px 18px 2px 6px;
+}
+
+#com-chilipeppr-widget-luaeditor .lastModifyDate {
+    /*font-style: italic;*/
+    color: #999999;
+}
+
+#com-chilipeppr-widget-luaeditor .devicefilename-region {
+    margin:8px 0px 0px 0px;
+    padding:0px 8px 8px 8px;
+    border:1px solid #46b8da;
+    box-shadow: 0px 0px 1px 0px #46b8da; /* Standard */
 }
 
 #com-chilipeppr-widget-luaeditor .close {
@@ -53,4 +66,9 @@
 
 .luaeditor-maineditor {
     font-size:13px;
+    height: 100%;
+    
+}
+.luaeditor-maineditor.empty {
+    opacity: 0;
 }

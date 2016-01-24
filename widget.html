@@ -206,15 +206,29 @@
                         data-delay="1000">
                         <span class="glyphicon glyphicon-trash"></span>
                     </button>
+                    <button class="btn btn-default btn-filerename" type="button"
+                        data-container="body" data-toggle="popover" 
+                        data-placement="auto" data-trigger="hover"
+                        data-content="Rename the file." 
+                        data-delay="1000">
+                        Rename <span class="hidden glyphicon glyphicon-edit"></span>
+                    </button>
                     <!--<button class="btn btn-default" type="button">-->
                     <!--    Download -->
                     <!--    <span class="glyphicon glyphicon-floppy-save"></span>-->
                     <!--</button>-->
                 </div>
-                <div class="input-group" style="padding-top:6px;">
-                    <input type="text" class="form-control devicefilename" 
-                    placeholder="myFilenameOnDevice" value="asdf">
-                    <span class="input-group-addon">.lua</span>
+                <div tabindex="0" class="devicefilename-region well hidden">
+                    <p style="padding-top:10px;">Give your file a name. The name will be used on the ESP8266 device as well 
+                    as the name in your local storage file list.</p>
+                    <div class="input-group" style="padding-top:2x;">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default btn-devicefilenamego" type="button">Go!</button>
+                        </span>
+                        <input type="text" class="form-control devicefilename" 
+                        placeholder="myFilenameOnDevice" value="asdf">
+                        <span class="input-group-addon">.lua</span>
+                    </div>
                 </div>
             </div>
             
@@ -225,27 +239,31 @@
             <!-- Nav tabs -->
             <ul class="nav nav-tabs" role="tablist">
    
-                <li class="active li-template"><a 
-                href="#com-chilipeppr-widget-tab-nodemcu-firmware" role="tab" 
-                data-toggle="tab"><span class="tab-file-name">udp.lua</span></a><button type="button" class="close" 
-                data-dismiss="alert" aria-label="Close"><span 
-                aria-hidden="true">×</span></button></li>
+                <!--<li class="active li-template"><a -->
+                <!--href="#com-chilipeppr-widget-tab-nodemcu-firmware" role="tab" -->
+                <!--data-toggle="tab"><span class="tab-file-name">udp.lua</span></a><button type="button" class="close" -->
+                <!--data-dismiss="alert" aria-label="Close"><span -->
+                <!--aria-hidden="true">×</span></button></li>-->
                 
-                <li class="xhidden"><a 
-                href="#com-chilipeppr-widget-tab-nodemcu-docs" role="tab" 
-                data-toggle="tab"><span class="tab-file-name">init.lua</span></a><button type="button" class="close" 
-                data-dismiss="alert" aria-label="Close"><span 
-                aria-hidden="true">×</span></button></li>
+                <!--<li class="xhidden"><a -->
+                <!--href="#com-chilipeppr-widget-tab-nodemcu-docs" role="tab" -->
+                <!--data-toggle="tab"><span class="tab-file-name">init.lua</span></a><button type="button" class="close" -->
+                <!--data-dismiss="alert" aria-label="Close"><span -->
+                <!--aria-hidden="true">×</span></button></li>-->
                 
                
             </ul>
             <!-- Tab panes -->
             
-            <!--<textarea class="form-control luaeditor-maineditor hidden" -->
-            <!--placeholder="Enter Lua code Here. Press Run in toolbar to send the Lua script to the selected serial port. Ctrl+Enter is shortcut for run." -->
-            <!--spellcheck="false" rows="5"></textarea>-->
+            <div class="tab-content">
+                <!--<textarea class="form-control luaeditor-maineditor hidden" -->
+                <!--placeholder="Enter Lua code Here. Press Run in toolbar to send the Lua script to the selected serial port. Ctrl+Enter is shortcut for run." -->
+                <!--spellcheck="false" rows="5"></textarea>-->
 
-            <div role="tabpanel" id="com-chilipeppr-widget-tab-nodemcu-firmware" class="tab-pane luaeditor-maineditor"></div>
+                <!--<div role="tabpanel" id="com-chilipeppr-widget-tab-nodemcu-firmware" class="tab-pane active luaeditor-maineditor"></div>-->
+            </div>
+            
+            <div id="com-chilipeppr-luaeditor" class="luaeditor-maineditor"></div>
 
         </div>
         <div class="panel-footer">
