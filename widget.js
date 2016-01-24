@@ -80,7 +80,7 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", "aceAuto
          */
         id: "com-chilipeppr-widget-luaeditor", // Make the id the same as the cpdefine id
         name: "Widget / Lua Editor", // The descriptive name of your widget.
-        desc: "Edit and run Lua code. Lots of sample Lua code too.", // A description of what your widget does
+        desc: "Edit and run Lua code with a multi-file editor. Save locally or upload/run remotely on the Lua device.", // A description of what your widget does
         url: "(auto fill by runme.js)",       // The final URL of the working widget as a single HTML file with CSS and Javascript inlined. You can let runme.js auto fill this if you are using Cloud9.
         fiddleurl: "(auto fill by runme.js)", // The edit URL. This can be auto-filled by runme.js in Cloud9 if you'd like, or just define it on your own to help people know where they can edit/fork your widget
         githuburl: "(auto fill by runme.js)", // The backing github repo
@@ -232,7 +232,7 @@ l = nil
                 if (this.aceIsLoaded) {
                     console.log("You are asking Ace to load a 2nd time, but we are already loaded.");
                     //return;
-                } else {
+                } else { 
                     // load ace
                     var editor = ace.edit(this.aceId);
                     editor.setTheme("ace/theme/monokai");
@@ -271,7 +271,7 @@ l = nil
                     
                 } else {
                     // we don't have a session, so need to create one
-                    this.aceCurrentSession = new ace.EditSession(this.aceSessionName, "ace/mode/lua")
+                    this.aceCurrentSession = new ace.EditSession('', "ace/mode/lua")
                     this.aceSessions[this.aceSessionName] = this.aceCurrentSession;
                     
                 }
@@ -300,7 +300,7 @@ l = nil
         },
         
         fileNewCtr: 0,
-        fileNew: function(evt, existing) {
+        fileNew: function(evt) {
             
             console.log("fileNew. evt:", evt);
             if (evt) $(evt.currentTarget).popover('hide');

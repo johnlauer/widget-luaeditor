@@ -1,5 +1,5 @@
 # com-chilipeppr-widget-luaeditor
-Edit and run Lua code. Lots of sample Lua code too.
+Edit and run Lua code with a multi-file editor. Save locally or upload/run remotely on the Lua device.
 
 ![alt text](screenshot.png "Screenshot")
 
@@ -13,7 +13,7 @@ not conflict with other ChiliPeppr widgets.
 | -------------         | ------------- | 
 | ID                    | com-chilipeppr-widget-luaeditor |
 | Name                  | Widget / Lua Editor |
-| Description           | Edit and run Lua code. Lots of sample Lua code too. |
+| Description           | Edit and run Lua code with a multi-file editor. Save locally or upload/run remotely on the Lua device. |
 | chilipeppr.load() URL | http://raw.githubusercontent.com/chilipeppr/widget-luaeditor/master/auto-generated-widget.html |
 | Edit URL              | http://ide.c9.io/chilipeppr/widget-luaeditor |
 | Github URL            | http://github.com/chilipeppr/widget-luaeditor |
@@ -91,7 +91,7 @@ The table below shows, in order, the methods and properties inside the widget/el
 | -------------         | ------------- | ----------- |
 | id | string | "com-chilipeppr-widget-luaeditor"<br><br>The ID of the widget. You must define this and make it unique. |
 | name | string | "Widget / Lua Editor" |
-| desc | string | "Edit and run Lua code. Lots of sample Lua code too." |
+| desc | string | "Edit and run Lua code with a multi-file editor. Save locally or upload/run remotely on the Lua device." |
 | url | string | "http://raw.githubusercontent.com/chilipeppr/widget-luaeditor/master/auto-generated-widget.html" |
 | fiddleurl | string | "http://ide.c9.io/chilipeppr/widget-luaeditor" |
 | githuburl | string | "http://github.com/chilipeppr/widget-luaeditor" |
@@ -112,7 +112,7 @@ The table below shows, in order, the methods and properties inside the widget/el
 | aceIsLoaded | boolean |  |
 | loadAce | function | function (sessionName)  |
 | fileNewCtr | number |  |
-| fileNew | function | function (evt, existing)  |
+| fileNew | function | function (evt)  |
 | createFileTab | function | function (id, filename)  |
 | onFileTabShow | function | function (e)  |
 | onFileTabClose | function | function (e)  |
