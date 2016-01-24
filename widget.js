@@ -68,7 +68,7 @@ cprequire_test(["inline:com-chilipeppr-widget-luaeditor"], function(myWidget) {
     $('title').html(myWidget.name);
     
     //$('#' + myWidget.id + ' .alert-devicefilename').removeClass("hidden");
-    $('#' + myWidget.id + ' .luaeditor-uploadrun').trigger("click");
+    //$('#' + myWidget.id + ' .luaeditor-uploadrun').trigger("click");
 
 } /*end_test*/ );
 
@@ -408,8 +408,12 @@ l = nil
             if (evt && 'needSaveAfter' in evt && evt.needSaveAfter) {
                 // we are showing the rename box and need to save afterwards
                 // so mark a bool that needs to get set to false later
-                
+            
+                // FOR NOW, ALWAYS SAVE AFTER    
             }
+            
+            // see if upload/run area is showing or not
+            
             $('#' + this.id + " .devicefilename-region").removeClass("hidden");
             $('#' + this.id + " .devicefilename").select();
             this.resize();
