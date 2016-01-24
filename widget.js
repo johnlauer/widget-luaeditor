@@ -635,7 +635,9 @@ l = nil
         },
         fileUpload: function(evt) {
             
-            $(evt.currentTarget).popover('hide');
+            console.log("fileUpload. evt:", evt);
+            
+            if (evt && 'currentTarget' in evt) $(evt.currentTarget).popover('hide');
 
             // grab txt of file
             var txt = this.getScript();
@@ -727,7 +729,9 @@ l = nil
 
         },
         fileRun: function(evt) {
-            $(evt.currentTarget).popover('hide');
+            
+            if (evt && 'currentTarget' in evt) $(evt.currentTarget).popover('hide');
+            
             var filename = this.cleanupFilename();
             if (filename == null || filename.length <= 0) {
                 // problem with filename
