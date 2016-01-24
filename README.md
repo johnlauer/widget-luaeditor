@@ -103,6 +103,8 @@ The table below shows, in order, the methods and properties inside the widget/el
 | jscript | object |  |
 | editor | object |  |
 | init | function | function ()  |
+| setupSubscribe | function | function () <br><br>Setup subscribe so others can publish to us and ask us toopen a file, i.e. the NodeMCU Files widget sends this to us. |
+| loadScript | function | function (data) <br><br>The method that receives the /loadScript publishes |
 | loadPrevFiles | function | function ()  |
 | getDeviceFileList | function | function ()  |
 | aceId | string | "com-chilipeppr-luaeditor"<br><br>The DOM ID of the element that should be the Ace Editor |

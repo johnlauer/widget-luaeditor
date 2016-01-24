@@ -159,9 +159,28 @@ cprequire_test(["inline:com-chilipeppr-widget-luaeditor"], function(myWidget) {
         }
     );
 
+    var testLoadScript = function() {
+        var file = {
+            name: "myfile.lua",
+            content: "print(\"hello world\")\nprint(\"cool\")"
+        }
+        chilipeppr.publish("/com-chilipeppr-widget-luaeditor/loadScript", file);
+    }
+    var testLoadScript2 = function() {
+        var file = {
+            name: "myfile.lua",
+            content: "print(\"hello world 2\")\nprint(\"cool 2\")\n"
+        }
+        chilipeppr.publish("/com-chilipeppr-widget-luaeditor/loadScript", file);
+    }
+    
     // init my widget
     myWidget.init();
     $('title').html(myWidget.name);
+    
+    // test
+    setTimeout(testLoadScript, 2000);
+    setTimeout(testLoadScript2, 6000);
     
     //$('#' + myWidget.id + ' .alert-devicefilename').removeClass("hidden");
     //$('#' + myWidget.id + ' .luaeditor-uploadrun').trigger("click");
@@ -240,6 +259,11 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", "aceAuto
             // capture ctrl+enter on textarea
             $('#' + this.id + ' .luaeditor-maineditor').keypress(this.jscriptKeypress.bind(this));
             
+            
+            // setup subscribe methods so others can publish to us and ask us to
+            // open a file
+            this.setupSubscribe();
+            
             // samples
             //this.setupSamples();
             
@@ -264,6 +288,70 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", "aceAuto
             
             
             console.log(this.name + " done loading.");
+        },
+        /**
+         * Setup subscribe so others can publish to us and ask us to
+         * open a file, i.e. the NodeMCU Files widget sends this to us.
+         */
+        setupSubscribe: function() {
+            chilipeppr.subscribe("/" + this.id + "/loadScript", this, this.loadScript);
+        },
+        /**
+         * The method that receives the /loadScript publishes
+         */
+        loadScript: function(data) {
+            console.log("got loadScript. data:", data);
+            
+            // see if this name exists, if so load contents into existing tab, but
+            // show flash msg
+            var filename = data.name;
+            filename = filename.replace(/\.lua$/, "");
+            
+            var id = "com-chilipeppr-widget-nodemcu-file-" + id; 
+            
+            if (id in this.aceSessions) {
+                // there is an existing tab/session
+                this.flashMsg("Loading to Existing File", 
+                "An editor tab exists for this filename, so replacing contents with this file. You can undo this by hitting Ctrl-Z.");
+                var session = this.aceSessions[id]; 
+                //session.setValue(data.content);
+                
+                // show the tab
+                var tabAEl = $("#" + this.id + ' a[href="#' + id + '"] ');
+                tabAEl.tab("show");
+                
+                // now we know it's our active tab, but since it is asynchronous
+                // we have to do this a bit later
+                var that = this;
+                setTimeout(function() {
+                    console.log("setting content of editor so we get undo");
+                    that.editor.setValue(data.content);
+                }, 100);
+                
+            } else {
+                // we are creating a new tab/session
+                // create the tab that represents our file
+                this.createFileTab(id, filename);
+                
+                // get file content
+                var content = data.content;
+                
+                // create the ace session before we load the ace editor
+                // make sure we store this session by it's id in the main
+                // array of sessions before we call loadAce, that way it
+                // can look for an existing session and use that instead of
+                // creating one
+                var session = new ace.EditSession(content, "ace/mode/lua")
+                this.aceSessions[id] = session;
+
+                // load the ace editor for this new file
+                this.loadAce(id);
+            }
+            
+
+            
+            this.resize();
+
         },
         loadPrevFiles: function() {
             // when we load, we try to reload previous files and tabs that
@@ -320,9 +408,9 @@ l = nil
                 this.aceSessionName = sessionName;
             }
             
-            console.log("trying to get ace. ace:", ace, " aceId:", this.aceId);
+            console.log("trying to get ace. ace:"); //, ace, " aceId:", this.aceId);
             //require("ace/mode/text_highlight_rules", function(xace) {
-            if (ace) { // && 'setValue' in ace) {
+            if ('ace' in window && ace) { // && 'setValue' in ace) {
                 console.log("got ace. ace:", ace);
                 
                 if (this.aceIsLoaded) {
@@ -376,6 +464,9 @@ l = nil
                 //editor.getSession().setMode("ace/mode/lua");
                 this.editor.getSession().setTabSize(2);
                 this.editor.getSession().setUseSoftTabs(true);
+                this.editor.getSession().setUndoManager(new ace.UndoManager());
+                
+                /*
                 this.editor.getSession().on('change', function(e) {
                     // e.type, etc
                     console.log("got change on editor. e:", e);
@@ -384,6 +475,8 @@ l = nil
                 this.editor.getSession().selection.on('changeSelection', function(e) {
                     console.log("got changeSelection on editor. e:", e); 
                 });
+                */
+                
                 console.log("ace session created:", this.aceCurrentSession);
 
             } else {
