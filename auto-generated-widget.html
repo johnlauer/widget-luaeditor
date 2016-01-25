@@ -258,6 +258,9 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", "aceAuto
             // saveScript
             //$('#' + this.id + ' .luaeditor-save').click(this.saveScript.bind(this));
             $('#' + this.id + ' .luaeditor-save').click(this.fileLocalSave.bind(this));
+
+            // resize
+            $('#' + this.id + ' .btn-resize').click(this.resizeEditor.bind(this));
             
             // setup del files
             $('#' + this.id + ' .recent-file-delete').click( this.deleteRecentFiles.bind(this));
@@ -472,6 +475,7 @@ l = nil
                 //editor.getSession().setMode("ace/mode/lua");
                 this.editor.getSession().setTabSize(2);
                 this.editor.getSession().setUseSoftTabs(true);
+                this.editor.getSession().setUseWrapMode(true);
                 this.editor.getSession().setUndoManager(new ace.UndoManager());
                 
                 /*
@@ -1344,6 +1348,10 @@ l = nil
             this.loadJscript(this.jscript);
             this.status("Loaded data \"" + info.name + "\"");
         },
+        resizeEditor: function() {
+            console.log("resizing editor");
+            this.editor.resize();    
+        },
         /**
          * Resize the widget to the height of the window
          */
@@ -1559,6 +1567,16 @@ l = nil
     
                         </ul>
                     </div>
+                </div>
+                
+                <div class="btn-group xpull-right" xstyle="margin-right:6px;">
+                    <button class="btn btn-default btn-xs btn-resize" type="button"
+                        data-container="body" data-toggle="popover" 
+                        data-placement="auto" data-trigger="hover"
+                        data-content="Resize the editor." 
+                        data-delay="1000">
+                        <span class="glyphicon glyphicon-fullscreen"></span>
+                    </button>
                 </div>
 
                 <div class="btn-group xpull-right hidden">

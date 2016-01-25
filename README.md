@@ -155,6 +155,7 @@ The table below shows, in order, the methods and properties inside the widget/el
 | createRecentFileEntry | function | function (fileStr, info)  |
 | buildRecentFileMenu | function | function ()  |
 | loadFileFromLocalStorageKey | function | function (key)  |
+| resizeEditor | function | function ()  |
 | resize | function | function () <br><br>Resize the widget to the height of the window |
 | loadJscript | function | function (txt)  |
 | setupSamples | function | function ()  |

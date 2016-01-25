@@ -162,6 +162,9 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", "aceAuto
             // saveScript
             //$('#' + this.id + ' .luaeditor-save').click(this.saveScript.bind(this));
             $('#' + this.id + ' .luaeditor-save').click(this.fileLocalSave.bind(this));
+
+            // resize
+            $('#' + this.id + ' .btn-resize').click(this.resizeEditor.bind(this));
             
             // setup del files
             $('#' + this.id + ' .recent-file-delete').click( this.deleteRecentFiles.bind(this));
@@ -376,6 +379,7 @@ l = nil
                 //editor.getSession().setMode("ace/mode/lua");
                 this.editor.getSession().setTabSize(2);
                 this.editor.getSession().setUseSoftTabs(true);
+                this.editor.getSession().setUseWrapMode(true);
                 this.editor.getSession().setUndoManager(new ace.UndoManager());
                 
                 /*
@@ -1247,6 +1251,10 @@ l = nil
             this.jscript = localStorage.getItem(key);
             this.loadJscript(this.jscript);
             this.status("Loaded data \"" + info.name + "\"");
+        },
+        resizeEditor: function() {
+            console.log("resizing editor");
+            this.editor.resize();    
         },
         /**
          * Resize the widget to the height of the window
