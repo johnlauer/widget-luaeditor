@@ -77,6 +77,13 @@ cprequire_test(["inline:com-chilipeppr-widget-luaeditor"], function(myWidget) {
         }
         chilipeppr.publish("/com-chilipeppr-widget-luaeditor/loadScript", file);
     }
+    var testLoadScript3 = function() {
+        var file = {
+            name: "differentfile.lua",
+            content: "print(\"hello world 3\")\nprint(\"cool 3\")\n"
+        }
+        chilipeppr.publish("/com-chilipeppr-widget-luaeditor/loadScript", file);
+    }
     
     // init my widget
     myWidget.init();
@@ -84,6 +91,7 @@ cprequire_test(["inline:com-chilipeppr-widget-luaeditor"], function(myWidget) {
     
     // test
     setTimeout(testLoadScript, 2000);
+    setTimeout(testLoadScript3, 4000);
     setTimeout(testLoadScript2, 6000);
     
     //$('#' + myWidget.id + ' .alert-devicefilename').removeClass("hidden");
