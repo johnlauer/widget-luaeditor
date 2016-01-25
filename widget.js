@@ -1272,6 +1272,7 @@ l = nil
             var logEl = $('#' + this.id + ' #' + this.aceId);
             var loght = logEl.height();
             logEl.height(loght + delta - 13);
+            if (this.editor) this.editor.resize();
         },
         loadJscript: function(txt) {
             //this.jscript = txt;
