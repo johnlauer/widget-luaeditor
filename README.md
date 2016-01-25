@@ -63,7 +63,7 @@ To better understand how ChiliPeppr's publish() method works see amplify.js's do
 
 | Signal | Description |
 | ------ | ----------- |
-| (No signals defined in this widget/element) |
+| /com-chilipeppr-widget-luaeditor/loadScript | Publish an object of {name:"myfile.lua", content:"print(\"hello world\")"} and we will open a new tab with the contents of the file. |
 
 ## Foreign Publish
 

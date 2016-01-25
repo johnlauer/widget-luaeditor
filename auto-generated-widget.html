@@ -219,7 +219,7 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", "aceAuto
         subscribe: {
             // Define a key:value pair here as strings to document what signals you subscribe to
             // so other widgets can publish to this widget to have it do something.
-            // '/onExampleConsume': 'Example: This widget subscribe to this signal so other widgets can send to us and we'll do something with it.'
+            '/loadScript': 'Publish an object of {name:"myfile.lua", content:"print(\\"hello world\\")"} and we will open a new tab with the contents of the file.'
         },
         /**
          * Document the foreign publish signals, i.e. signals owned by other widgets
@@ -307,7 +307,7 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", "aceAuto
             var filename = data.name;
             filename = filename.replace(/\.lua$/, "");
             
-            var id = "com-chilipeppr-widget-nodemcu-file-" + id; 
+            var id = "com-chilipeppr-widget-nodemcu-file-" + filename; 
             
             if (id in this.aceSessions) {
                 // there is an existing tab/session
