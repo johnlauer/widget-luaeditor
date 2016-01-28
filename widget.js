@@ -106,8 +106,8 @@ cpdefine("inline:com-chilipeppr-widget-luaeditor", ["chilipeppr_ready", "aceAuto
          * The ID of the widget. You must define this and make it unique.
          */
         id: "com-chilipeppr-widget-luaeditor", // Make the id the same as the cpdefine id
-        name: "Widget / Lua Editor", // The descriptive name of your widget.
-        desc: "Edit and run Lua code with a multi-file editor. Save locally or upload/run remotely on the Lua device.", // A description of what your widget does
+        name: "Widget / Lua Editor for John1", // The descriptive name of your widget.
+        desc: "John1 - Edit and run Lua code with a multi-file editor. Save locally or upload/run remotely on the Lua device.", // A description of what your widget does
         url: "(auto fill by runme.js)",       // The final URL of the working widget as a single HTML file with CSS and Javascript inlined. You can let runme.js auto fill this if you are using Cloud9.
         fiddleurl: "(auto fill by runme.js)", // The edit URL. This can be auto-filled by runme.js in Cloud9 if you'd like, or just define it on your own to help people know where they can edit/fork your widget
         githuburl: "(auto fill by runme.js)", // The backing github repo
