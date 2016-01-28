@@ -14,10 +14,10 @@ not conflict with other ChiliPeppr widgets.
 | ID                    | com-chilipeppr-widget-luaeditor |
 | Name                  | Widget / Lua Editor |
 | Description           | Edit and run Lua code with a multi-file editor. Save locally or upload/run remotely on the Lua device. |
-| chilipeppr.load() URL | http://raw.githubusercontent.com/chilipeppr/widget-luaeditor/master/auto-generated-widget.html |
-| Edit URL              | http://ide.c9.io/chilipeppr/widget-luaeditor |
-| Github URL            | http://github.com/chilipeppr/widget-luaeditor |
-| Test URL              | https://preview.c9users.io/chilipeppr/widget-luaeditor/widget.html |
+| chilipeppr.load() URL | http://raw.githubusercontent.com/johnlauer/widget-luaeditor/master/auto-generated-widget.html |
+| Edit URL              | http://ide.c9.io/johnlauer/widget-luaeditor |
+| Github URL            | http://github.com/johnlauer/widget-luaeditor |
+| Test URL              | https://preview.c9users.io/johnlauer/widget-luaeditor/widget.html |
 
 ## Example Code for chilipeppr.load() Statement
 
@@ -30,7 +30,7 @@ back the instance of it.
 ```javascript
 chilipeppr.load(
   "#myDivWidgetInsertedInto",
-  "http://raw.githubusercontent.com/chilipeppr/widget-luaeditor/master/auto-generated-widget.html",
+  "http://raw.githubusercontent.com/johnlauer/widget-luaeditor/master/auto-generated-widget.html",
   function() {
     // Callback after widget loaded into #myDivWidgetInsertedInto
     cprequire(
@@ -92,10 +92,10 @@ The table below shows, in order, the methods and properties inside the widget/el
 | id | string | "com-chilipeppr-widget-luaeditor"<br><br>The ID of the widget. You must define this and make it unique. |
 | name | string | "Widget / Lua Editor" |
 | desc | string | "Edit and run Lua code with a multi-file editor. Save locally or upload/run remotely on the Lua device." |
-| url | string | "http://raw.githubusercontent.com/chilipeppr/widget-luaeditor/master/auto-generated-widget.html" |
-| fiddleurl | string | "http://ide.c9.io/chilipeppr/widget-luaeditor" |
-| githuburl | string | "http://github.com/chilipeppr/widget-luaeditor" |
-| testurl | string | "http://widget-luaeditor-chilipeppr.c9users.io/widget.html" |
+| url | string | "http://raw.githubusercontent.com/johnlauer/widget-luaeditor/master/auto-generated-widget.html" |
+| fiddleurl | string | "http://ide.c9.io/johnlauer/widget-luaeditor" |
+| githuburl | string | "http://github.com/johnlauer/widget-luaeditor" |
+| testurl | string | "http://widget-luaeditor-johnlauer.c9users.io/widget.html" |
 | publish | object | Please see docs above.<br><br>Define the publish signals that this widget/element owns or defines so thatother widgets know how to subscribe to them and what they do. |
 | subscribe | object | Please see docs above.<br><br>Define the subscribe signals that this widget/element owns or defines so thatother widgets know how to subscribe to them and what they do. |
 | foreignPublish | object | Please see docs above.<br><br>Document the foreign publish signals, i.e. signals owned by other widgetsor elements, that this widget/element publishes to. |
